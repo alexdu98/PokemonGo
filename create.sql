@@ -1,42 +1,39 @@
-SET SERVEROUTPUT ON;
 /*
 	Suppression de tous les types et
 	de toutes les tables.
 */
 
-/* NE PAS MODIFIER L'ORDRE !!! */
-DROP TABLE Niveau_Succes;
-DROP TABLE Equipe;
-DROP TABLE Dresseur;
-DROP TABLE Pokemon;
-DROP TABLE Item;
-DROP TABLE Attaque;
-/* NE PAS MODIFIER L'ORDRE !!! */
-DROP TYPE Date_Visite_t;
-DROP TYPE Bonbon_t;
-DROP TYPE Dresseur_t;
-DROP TYPE Arene_t;
-DROP TYPE Pokestop_t;
-DROP TYPE Point_Interet_t;
-DROP TYPE Pokemon_Sauvage_t;
-DROP TYPE Liste_Pokemon;
-DROP TYPE Pokemon_Capture_t;
-DROP TYPE Entite_Pokemon_t;
-DROP TYPE Pokemon_t;
-DROP TYPE Liste_attaques;
-DROP TYPE Attaque_t;
-DROP TYPE Equipe_t;
-DROP TYPE Avatar_t;
-DROP TYPE Niveau_t;
-DROP TYPE Entite_Item_t;
-DROP TYPE Liste_Items;
-DROP TYPE Item_t;
-DROP TYPE Liste_Oeufs;
-DROP TYPE Oeuf_t;
-DROP TYPE Liste_succes;
-DROP TYPE Succes_t;
-DROP TYPE Niveau_Succes_t;
-DROP TYPE Coordonnees_t;
+DROP TABLE Niveau_Succes FORCE;
+DROP TABLE Equipe FORCE;
+DROP TABLE Dresseur FORCE;
+
+DROP TYPE Couleur_t FORCE;
+DROP TYPE Date_Visite_t FORCE;
+DROP TYPE Bonbon_t FORCE;
+DROP TYPE Dresseur_t FORCE;
+DROP TYPE Arene_t FORCE;
+DROP TYPE Liste_Defenseurs FORCE;
+DROP TYPE Pokestop_t FORCE;
+DROP TYPE Point_Interet_t FORCE;
+DROP TYPE Pokemon_Sauvage_t FORCE;
+DROP TYPE Liste_Pokemon FORCE;
+DROP TYPE Pokemon_Capture_t FORCE;
+DROP TYPE Entite_Pokemon_t FORCE;
+DROP TYPE Pokemon_t FORCE;
+DROP TYPE Liste_attaques FORCE;
+DROP TYPE Attaque_t FORCE;
+DROP TYPE Equipe_t FORCE;
+DROP TYPE Avatar_t FORCE;
+DROP TYPE Niveau_t FORCE;
+DROP TYPE Entite_Item_t FORCE;
+DROP TYPE Liste_Items FORCE;
+DROP TYPE Item_t FORCE;
+DROP TYPE Liste_Oeufs FORCE;
+DROP TYPE Oeuf_t FORCE;
+DROP TYPE Succes_t FORCE;
+DROP TYPE Niveau_Succes_t FORCE;
+DROP TYPE Coordonnees_t FORCE;
+
 -- ################################################
 -- ################################################
 
@@ -86,13 +83,9 @@ CREATE OR REPLACE TYPE Equipe_t AS OBJECT (
 */
 CREATE OR REPLACE TYPE Succes_t AS OBJECT (
 	id int,
-	niveau_succes Niveau_Succes_t,
 	nom varchar(255),
 	conditions varchar(255)
 );
-/
-
-CREATE OR REPLACE TYPE Liste_succes AS TABLE OF Succes_t;
 /
 
 CREATE OR REPLACE TYPE Niveau_t AS OBJECT (
@@ -118,24 +111,6 @@ CREATE OR REPLACE TYPE Oeuf_t AS OBJECT (
 /
 
 CREATE OR REPLACE TYPE Liste_Oeufs AS VARRAY (9) OF Oeuf_t;
-/
-
-CREATE OR REPLACE TYPE Point_Interet_t AS OBJECT (
-	coordonnees Coordonnees_t,
-	nom varchar(255)
-) NOT INSTANTIABLE NOT FINAL;
-/
-
-CREATE OR REPLACE TYPE Pokestop_t UNDER Point_Interet_t (
-	point_interet Point_interet_t
-);
-/
-
-CREATE OR REPLACE TYPE Arene_t AS OBJECT (
-	point_interet Point_Interet_t,
-	equipe Equipe_t,
-	prestige int
-);
 /
 
 CREATE OR REPLACE TYPE Item_t AS OBJECT (
@@ -170,11 +145,33 @@ CREATE OR REPLACE TYPE Pokemon_Capture_t UNDER Entite_Pokemon_t (
 	Attaques Liste_Attaques,
 	taille float,
 	poids float
-	--maitre REF Dresseur_t
+	-- maitre REF Dresseur_t -- besoin du alter type
 );
 /
 
 CREATE OR REPLACE TYPE Liste_Pokemon AS VARRAY (150) OF Pokemon_Capture_t;
+/
+
+CREATE OR REPLACE TYPE Point_Interet_t AS OBJECT (
+	coordonnees Coordonnees_t,
+	nom varchar(255)
+) NOT INSTANTIABLE NOT FINAL;
+/
+
+CREATE OR REPLACE TYPE Pokestop_t UNDER Point_Interet_t (
+	point_interet Point_interet_t
+);
+/
+
+CREATE OR REPLACE TYPE Liste_Defenseurs AS VARRAY (3) OF Pokemon_Capture_t;
+/
+
+CREATE OR REPLACE TYPE Arene_t AS OBJECT (
+	point_interet Point_Interet_t,
+	equipe Equipe_t,
+	prestige int,
+	Pokemons Liste_Defenseurs
+);
 /
 
 CREATE OR REPLACE TYPE Dresseur_t AS OBJECT (
@@ -188,10 +185,16 @@ CREATE OR REPLACE TYPE Dresseur_t AS OBJECT (
 	pokecoins int,
 	stardusts int,
 	niveau Niveau_t,
-	succes Liste_succes,
 	pokemons Liste_Pokemon,
 	items Liste_items,
 	oeufs Liste_Oeufs
+);
+/
+
+CREATE OR REPLACE TYPE Couleur_t AS OBJECT (
+	couleur Niveau_Succes_t,
+	maitre REF Dresseur_t,
+	succes REF Succes_t
 );
 /
 
@@ -209,7 +212,8 @@ CREATE OR REPLACE TYPE Date_Visite_t AS OBJECT (
 );
 /
 
--- ALTER TYPE Pokemon_Capture_t ADD ATTRIBUTE maitre REF Dresseur_t;
+-- On ajoute la référence du dresseur dans un Pokémon capturé car ils ont une référence l'un à l'autre
+ALTER TYPE Pokemon_Capture_t ADD ATTRIBUTE maitre REF Dresseur_t CASCADE;
 
 -- ################################################
 -- ################################################
@@ -225,7 +229,4 @@ CREATE TABLE Equipe OF Equipe_t (
 	CHECK(couleur IN ('rouge', 'bleu', 'jaune'))
 );
 
-CREATE TABLE Dresseur OF Dresseur_t NESTED TABLE succes STORE AS table_succes, NESTED TABLE items STORE AS table_items;
-CREATE TABLE Pokemon OF Pokemon_t;
-CREATE TABLE Item OF Item_t;
-CREATE TABLE Attaque OF Attaque_t;
+CREATE TABLE Dresseur OF Dresseur_t NESTED TABLE items STORE AS table_items;
