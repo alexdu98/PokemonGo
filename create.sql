@@ -149,7 +149,7 @@ CREATE OR REPLACE TYPE Pokemon_Capture_t UNDER Entite_Pokemon_t (
 );
 /
 
-CREATE OR REPLACE TYPE Liste_Pokemon AS VARRAY (150) OF Pokemon_Capture_t;
+CREATE OR REPLACE TYPE Liste_Pokemon AS VARRAY (250) OF Pokemon_Capture_t;
 /
 
 CREATE OR REPLACE TYPE Point_Interet_t AS OBJECT (
@@ -230,3 +230,10 @@ CREATE TABLE Equipe OF Equipe_t (
 );
 
 CREATE TABLE Dresseur OF Dresseur_t NESTED TABLE items STORE AS table_items;
+
+-- ################################################
+-- ################################################
+
+/*
+	Création des triggers de vérification des contraintes
+*/
