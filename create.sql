@@ -1,15 +1,25 @@
+set sqlblanklines on
 /*
 	Suppression de tous les types et
 	de toutes les tables.
 */
 
-DROP TABLE Niveau_Succes FORCE;
-DROP TABLE Equipe FORCE;
-DROP TABLE Dresseur FORCE;
+DROP TABLE Niveau CASCADE CONSTRAINTS;
+DROP TABLE Dresseur CASCADE CONSTRAINTS;
+DROP TABLE Succes CASCADE CONSTRAINTS;
+DROP TABLE Avancement_Succes CASCADE CONSTRAINTS; 
+DROP TABLE Item CASCADE CONSTRAINTS;
+DROP TABLE Posseder_Item CASCADE CONSTRAINTS;
+DROP TABLE Pokemon CASCADE CONSTRAINTS;
+DROP TABLE Pokemon_Capture CASCADE CONSTRAINTS;
+DROP TABLE Pokemon_Sauvage CASCADE CONSTRAINTS;
+DROP TABLE Bonbon CASCADE CONSTRAINTS;
+DROP TABLE Pokestop CASCADE CONSTRAINTS;
+DROP TABLE Arene CASCADE CONSTRAINTS;
+DROP TABLE Visite_Pokestop CASCADE CONSTRAINTS;
+
 
 DROP TYPE Couleur_t FORCE;
-DROP TYPE Date_Visite_t FORCE;
-DROP TYPE Bonbon_t FORCE;
 DROP TYPE Dresseur_t FORCE;
 DROP TYPE Arene_t FORCE;
 DROP TYPE Liste_Defenseurs FORCE;
@@ -19,19 +29,11 @@ DROP TYPE Pokemon_Sauvage_t FORCE;
 DROP TYPE Liste_Pokemon FORCE;
 DROP TYPE Pokemon_Capture_t FORCE;
 DROP TYPE Entite_Pokemon_t FORCE;
-DROP TYPE Pokemon_t FORCE;
 DROP TYPE Liste_attaques FORCE;
 DROP TYPE Attaque_t FORCE;
-DROP TYPE Equipe_t FORCE;
 DROP TYPE Avatar_t FORCE;
-DROP TYPE Niveau_t FORCE;
-DROP TYPE Entite_Item_t FORCE;
-DROP TYPE Liste_Items FORCE;
-DROP TYPE Item_t FORCE;
 DROP TYPE Liste_Oeufs FORCE;
 DROP TYPE Oeuf_t FORCE;
-DROP TYPE Succes_t FORCE;
-DROP TYPE Niveau_Succes_t FORCE;
 DROP TYPE Coordonnees_t FORCE;
 
 -- ################################################
@@ -114,21 +116,20 @@ CREATE OR REPLACE TYPE Liste_Pokemon AS VARRAY (250) OF Pokemon_Capture_t;
 /
 
 CREATE OR REPLACE TYPE Point_Interet_t AS OBJECT (
+	id NUMBER,
 	coordonnees Coordonnees_t,
 	nom varchar(255)
 ) NOT INSTANTIABLE NOT FINAL;
 /
 
 CREATE OR REPLACE TYPE Pokestop_t UNDER Point_Interet_t (
-	point_interet Point_interet_t
 );
 /
 
 CREATE OR REPLACE TYPE Liste_Defenseurs AS VARRAY (3) OF Pokemon_Capture_t;
 /
 
-CREATE OR REPLACE TYPE Arene_t AS OBJECT (
-	point_interet Point_Interet_t,
+CREATE OR REPLACE TYPE Arene_t UNDER Point_Interet_t (
 	equipe Equipe_t,
 	prestige NUMBER,
 	Pokemons Liste_Defenseurs
@@ -181,7 +182,8 @@ CREATE TABLE Niveau (
 );
 
 CREATE TABLE Dresseur OF Dresseur_t (
-       CONSTRAINT FK_Dresseur_Niveau FOREIGN KEY (niveau) REFERENCES Niveau(id) 
+	CONSTRAINT PK_Dresseur_id PRIMARY KEY (id),
+       	CONSTRAINT FK_Dresseur_Niveau FOREIGN KEY (niveau) REFERENCES Niveau(id) 
 );
 
 CREATE TABLE Succes (
@@ -190,32 +192,38 @@ CREATE TABLE Succes (
 	conditions varchar(255),
 	CONSTRAINT PK_Succes_ID PRIMARY KEY (id),
 	CONSTRAINT NN_Succes_Nom CHECK (nom IS NOT NULL),
-	CONSTRAINT UNI_Succes_Nom CHECK (nom IS UNIQUE)
+	CONSTRAINT UNI_Succes_Nom UNIQUE(nom)
 );
 
 CREATE TABLE Avancement_Succes (
        id_succes NUMBER,
+       id_dresseur NUMBER, /* On est oblige d'ajouter l'id des objets dresseur_t car une ref ne peut pas etre une cle primaire */
        dresseur REF Dresseur_t,
-       avancement ENUM ('bronze', 'argent', 'or'),
-       CONSTRAINT PK_Av_Succes PRIMARY KEY (id_succes, dresseur),
+       avancement VARCHAR(7),
+       CONSTRAINT PK_Av_Succes PRIMARY KEY (id_succes, id_dresseur),
        CONSTRAINT FK_AvSuc_ID_Suc FOREIGN KEY (id_succes) REFERENCES Succes(id) ON DELETE CASCADE,
-       CONSTRAINT REF_AvSuc_Dresseur FOREIGN KEY (dresseur) REFERENCES Dresseur ON DELETE CASCADE
+       CONSTRAINT FK_AvSuc_ID_Dresseur FOREIGN KEY (id_dresseur) REFERENCES Dresseur(id) ON DELETE CASCADE,
+       CONSTRAINT REF_AvSuc_Dresseur FOREIGN KEY (dresseur) REFERENCES Dresseur ON DELETE CASCADE,
+       CONSTRAINT CK_AvSc_AvDomain CHECK (avancement in ('bronze', 'argent', 'or'))
+
 );
 
 CREATE TABLE Item (
        type_item varchar(31),
-       description varchar(255)
+       description varchar(255),
        CONSTRAINT PK_Item_TypeI PRIMARY KEY (type_item),
        CONSTRAINT NN_Item_Desc CHECK (description IS NOT NULL)
 );
 
 CREATE TABLE Posseder_Item (
        type_item VARCHAR(31),
-       dresseur Dresseur_t,
+       id_dresseur NUMBER, 
+       dresseur REF Dresseur_t,
        nb_item NUMBER,
-       CONSTRAINT PK_PossItem PRIMARY KEY (type_item, dresseur),
+       CONSTRAINT PK_PossItem PRIMARY KEY (type_item, id_dresseur),
        CONSTRAINT FK_PossItem_Item FOREIGN KEY (type_item) REFERENCES Item(type_item),
-       CONSTRAINT FK_PossItem_Dresseur FOREIGN KEY (dresseur)REFERENCES Dresseur ON DELETE CASCADE
+       CONSTRAINT FK_PossItem_ID_Dresseur FOREIGN KEY (id_dresseur) REFERENCES Dresseur(id) ON DELETE CASCADE,
+       CONSTRAINT REF_PossItem_Dresseur FOREIGN KEY (dresseur) REFERENCES Dresseur ON DELETE CASCADE
 );
 
 CREATE TABLE Pokemon (
@@ -223,8 +231,8 @@ CREATE TABLE Pokemon (
 	cout_evolution NUMBER,
 	type_elementaire varchar(31),
 	evolution varchar(32),
-	CONSTRAINT PK_Pokemon_Nom PRIMARY KEY (nom) ON DELETE CASCADE,
-	CONSTRAINT FK_Pokemon_evol FOREIGN KEY (evolution) REFERENCES Pokemon(nom) ON DELETE CASCADE
+	CONSTRAINT PK_Pokemon_race PRIMARY KEY (race),
+	CONSTRAINT FK_Pokemon_evol FOREIGN KEY (evolution) REFERENCES Pokemon(race) ON DELETE CASCADE
    
 );
 
@@ -240,21 +248,36 @@ CREATE TABLE Pokemon_Sauvage OF Pokemon_Sauvage_t (
 
 CREATE TABLE Bonbon (
        race_pokemon VARCHAR(32),
+	id_dresseur NUMBER,
        dresseur REF Dresseur_t,
        nb_bonbons NUMBER,
-       CONSTRAINT PK_Bonbon PRIMARY KEY (race_pokemon, dresseur),
+       CONSTRAINT PK_Bonbon PRIMARY KEY (race_pokemon, id_dresseur),
        CONSTRAINT FK_Bonbon_Pokemon FOREIGN KEY (race_pokemon) REFERENCES Pokemon(race),
-       CONSTRAINT FK_Bonbon_Dresseur FOREIGN KEY (dresseur) REFERENCES Dresseur ON DELETE CASCADE
+       CONSTRAINT FK_Bonbon_ID_Dresseur FOREIGN KEY (id_dresseur) REFERENCES Dresseur(id) ON DELETE CASCADE,
+       CONSTRAINT REF_Bonbon_Dresseur FOREIGN KEY (dresseur) REFERENCES Dresseur ON DELETE CASCADE
+
 );
 
+CREATE TABLE Pokestop OF Pokestop_t (
+	CONSTRAINT PK_Pokestop_ID PRIMARY KEY (id)
+);
+
+CREATE TABLE Arene OF Arene_t (
+	CONSTRAINT PK_Arene_ID PRIMARY KEY (id)
+);
 
 CREATE TABLE Visite_Pokestop (
 	date_derniere_visite DATE,
+	id_dresseur NUMBER,
+	id_pokestop NUMBER,
 	dresseur REF Dresseur_t,
-	pokestop REF Pokestop_t
-	CONSTRAINT PK_Visite_Pokestop PRIMARY KEY (dresseur, pokestop),
-	CONSTRAINT FK_VisitePKS_dresseur FOREIGN KEY (dresseur) REFERENCES Dresseur ON DELETE CASCADE,
-	CONSTRAINT FK_VisitePKS_pokestop FOREIGN KEY (pokestop) REFERENCES Pokestop ON DELETE CASCADE
+	pokestop REF Pokestop_t,
+	CONSTRAINT PK_Visite_Pokestop PRIMARY KEY (id_dresseur, id_pokestop),
+	CONSTRAINT REF_VisitePKS_dresseur FOREIGN KEY (dresseur) REFERENCES Dresseur ON DELETE CASCADE,
+	CONSTRAINT REF_VisitePKS_pokestop FOREIGN KEY (pokestop) REFERENCES Pokestop ON DELETE CASCADE,
+	CONSTRAINT FK_VisitePKS_id_dresseur FOREIGN KEY (id_dresseur) REFERENCES Dresseur(id) ON DELETE CASCADE,
+	CONSTRAINT FK_VisitePKS_id_pokestop FOREIGN KEY (id_pokestop) REFERENCES Pokestop(id) ON DELETE CASCADE
+
 );
 /
 
