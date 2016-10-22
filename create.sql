@@ -46,16 +46,11 @@ CREATE OR REPLACE TYPE Coordonnees_t AS OBJECT (
 );
 /
 
-CREATE OR REPLACE TYPE Niveau_Succes_t AS OBJECT (
-	niveau varchar(10)
-);
-/
-
 CREATE OR REPLACE TYPE Attaque_t AS OBJECT (
 	nom varchar(31),
 	type varchar(31), -- soin ou dégât
-	valeur_min int,
-	valeur_max int
+	valeur_min NUMBER,
+	valeur_max NUMBER
 );
 /
 
@@ -81,55 +76,21 @@ CREATE OR REPLACE TYPE Equipe_t AS OBJECT (
 /*
 	Création des autres types
 */
-CREATE OR REPLACE TYPE Succes_t AS OBJECT (
-	id int,
-	nom varchar(255),
-	conditions varchar(255)
-);
-/
 
-CREATE OR REPLACE TYPE Niveau_t AS OBJECT (
-	id int,
-	min_xp int,
-	max_xp int
-);
-/
-
-CREATE OR REPLACE TYPE Pokemon_t AS OBJECT (
-	nom varchar(32),
-	cout_evolution int,
-	type varchar(31),
-	evolution REF Pokemon_t
-);
-/
 
 CREATE OR REPLACE TYPE Oeuf_t AS OBJECT (
 	incubation number(1),
-	km_parcourus int,
-	km_eclosion int
+	km_parcourus NUMBER,
+	km_eclosion NUMBER
 );
 /
 
 CREATE OR REPLACE TYPE Liste_Oeufs AS VARRAY (9) OF Oeuf_t;
 /
 
-CREATE OR REPLACE TYPE Item_t AS OBJECT (
-	type varchar(31),
-	description varchar(255)
-);
-/
-
-CREATE OR REPLACE TYPE Liste_Items AS TABLE OF Item_t;
-/
-
-CREATE OR REPLACE TYPE Entite_Item_t AS OBJECT (
-	nb_item int,
-	description REF Item_t
-);
-/
-
 CREATE OR REPLACE TYPE Entite_Pokemon_t AS OBJECT (
-	race REF Pokemon_t
+       id NUMBER,
+       race varchar(32)
 ) NOT INSTANTIABLE NOT FINAL;
 /
 
@@ -139,9 +100,9 @@ CREATE OR REPLACE TYPE Pokemon_Sauvage_t UNDER Entite_Pokemon_t (
 /
 
 CREATE OR REPLACE TYPE Pokemon_Capture_t UNDER Entite_Pokemon_t (
-	cout_evolution int,
-	cp int,
-	hp int,
+	cout_evolution NUMBER,
+	cp NUMBER,
+	hp NUMBER,
 	Attaques Liste_Attaques,
 	taille float,
 	poids float
@@ -169,24 +130,23 @@ CREATE OR REPLACE TYPE Liste_Defenseurs AS VARRAY (3) OF Pokemon_Capture_t;
 CREATE OR REPLACE TYPE Arene_t AS OBJECT (
 	point_interet Point_Interet_t,
 	equipe Equipe_t,
-	prestige int,
+	prestige NUMBER,
 	Pokemons Liste_Defenseurs
 );
 /
 
 CREATE OR REPLACE TYPE Dresseur_t AS OBJECT (
-	id int,
+	id NUMBER,
 	avatar Avatar_t,
 	pseudo varchar(31),
 	coordonnees Coordonnees_t,
-	xp_actuel int,
-	date_inscription date,
+	xp_actuel NUMBER,
+	niveau NUMBER,
+	date_inscription date,	
 	equipe Equipe_t,
-	pokecoins int,
-	stardusts int,
-	niveau Niveau_t,
+	pokecoins NUMBER,
+	stardusts NUMBER,
 	pokemons Liste_Pokemon,
-	items Liste_items,
 	oeufs Liste_Oeufs
 );
 /
@@ -198,19 +158,6 @@ CREATE OR REPLACE TYPE Couleur_t AS OBJECT (
 );
 /
 
-CREATE OR REPLACE TYPE Bonbon_t AS OBJECT (
-	nb_bonbon int,
-	maitre REF Dresseur_t,
-	race REF Pokemon_t
-);
-/
-
-CREATE OR REPLACE TYPE Date_Visite_t AS OBJECT (
-	date_visite date,
-	dresseur REF Dresseur_t,
-	pokestop REF Pokestop_t
-);
-/
 
 -- On ajoute la référence du dresseur dans un Pokémon capturé car ils ont une référence l'un à l'autre
 ALTER TYPE Pokemon_Capture_t ADD ATTRIBUTE maitre REF Dresseur_t CASCADE;
@@ -219,17 +166,99 @@ ALTER TYPE Pokemon_Capture_t ADD ATTRIBUTE maitre REF Dresseur_t CASCADE;
 -- ################################################
 
 /*
-	Création des tables
+	Creation des tables
 */
-CREATE TABLE Niveau_Succes OF Niveau_Succes_t (
-	CHECK(niveau IN ('bronze', 'argent', 'or'))
+
+
+CREATE TABLE Niveau (
+       id NUMBER,
+       min_xp FLOAT,
+       max_xp FLOAT,
+       CONSTRAINT PK_Niveau_ID PRIMARY KEY (id),
+       CONSTRAINT NN_Niveau_max_xp CHECK (max_xp IS NOT NULL),
+       CONSTRAINT NN_Niveau_min_xp CHECK (min_xp IS NOT NULL),			
+       CONSTRAINT CK_MIN_MAX CHECK (min_xp < max_xp)
 );
 
-CREATE TABLE Equipe OF Equipe_t (
-	CHECK(couleur IN ('rouge', 'bleu', 'jaune'))
+CREATE TABLE Dresseur OF Dresseur_t (
+       CONSTRAINT FK_Dresseur_Niveau FOREIGN KEY (niveau) REFERENCES Niveau(id) 
 );
 
-CREATE TABLE Dresseur OF Dresseur_t NESTED TABLE items STORE AS table_items;
+CREATE TABLE Succes (
+	id NUMBER,
+	nom varchar(255),
+	conditions varchar(255),
+	CONSTRAINT PK_Succes_ID PRIMARY KEY (id),
+	CONSTRAINT NN_Succes_Nom CHECK (nom IS NOT NULL),
+	CONSTRAINT UNI_Succes_Nom CHECK (nom IS UNIQUE)
+);
+
+CREATE TABLE Avancement_Succes (
+       id_succes NUMBER,
+       dresseur REF Dresseur_t,
+       avancement ENUM ('bronze', 'argent', 'or'),
+       CONSTRAINT PK_Av_Succes PRIMARY KEY (id_succes, dresseur),
+       CONSTRAINT FK_AvSuc_ID_Suc FOREIGN KEY (id_succes) REFERENCES Succes(id) ON DELETE CASCADE,
+       CONSTRAINT REF_AvSuc_Dresseur FOREIGN KEY (dresseur) REFERENCES Dresseur ON DELETE CASCADE
+);
+
+CREATE TABLE Item (
+       type_item varchar(31),
+       description varchar(255)
+       CONSTRAINT PK_Item_TypeI PRIMARY KEY (type_item),
+       CONSTRAINT NN_Item_Desc CHECK (description IS NOT NULL)
+);
+
+CREATE TABLE Posseder_Item (
+       type_item VARCHAR(31),
+       dresseur Dresseur_t,
+       nb_item NUMBER,
+       CONSTRAINT PK_PossItem PRIMARY KEY (type_item, dresseur),
+       CONSTRAINT FK_PossItem_Item FOREIGN KEY (type_item) REFERENCES Item(type_item),
+       CONSTRAINT FK_PossItem_Dresseur FOREIGN KEY (dresseur)REFERENCES Dresseur ON DELETE CASCADE
+);
+
+CREATE TABLE Pokemon (
+	race varchar(32),
+	cout_evolution NUMBER,
+	type_elementaire varchar(31),
+	evolution varchar(32),
+	CONSTRAINT PK_Pokemon_Nom PRIMARY KEY (nom) ON DELETE CASCADE,
+	CONSTRAINT FK_Pokemon_evol FOREIGN KEY (evolution) REFERENCES Pokemon(nom) ON DELETE CASCADE
+   
+);
+
+CREATE TABLE Pokemon_Capture OF Pokemon_Capture_t (
+       CONSTRAINT PK_PokeCapt_id PRIMARY KEY (id),
+       CONSTRAINT FK_PokeCapt_Pokemon FOREIGN KEY (race) REFERENCES Pokemon(race) 
+);
+
+CREATE TABLE Pokemon_Sauvage OF Pokemon_Sauvage_t (
+       CONSTRAINT PK_PokeSauv_id PRIMARY KEY (id),
+       CONSTRAINT FK_PokeSauv_Pokemon FOREIGN KEY (race) REFERENCES Pokemon(race)
+);
+
+CREATE TABLE Bonbon (
+       race_pokemon VARCHAR(32),
+       dresseur REF Dresseur_t,
+       nb_bonbons NUMBER,
+       CONSTRAINT PK_Bonbon PRIMARY KEY (race_pokemon, dresseur),
+       CONSTRAINT FK_Bonbon_Pokemon FOREIGN KEY (race_pokemon) REFERENCES Pokemon(race),
+       CONSTRAINT FK_Bonbon_Dresseur FOREIGN KEY (dresseur) REFERENCES Dresseur ON DELETE CASCADE
+);
+
+
+CREATE TABLE Visite_Pokestop (
+	date_derniere_visite DATE,
+	dresseur REF Dresseur_t,
+	pokestop REF Pokestop_t
+	CONSTRAINT PK_Visite_Pokestop PRIMARY KEY (dresseur, pokestop),
+	CONSTRAINT FK_VisitePKS_dresseur FOREIGN KEY (dresseur) REFERENCES Dresseur ON DELETE CASCADE,
+	CONSTRAINT FK_VisitePKS_pokestop FOREIGN KEY (pokestop) REFERENCES Pokestop ON DELETE CASCADE
+);
+/
+
+
 
 -- ################################################
 -- ################################################
