@@ -233,14 +233,15 @@ CREATE TABLE Pokemon (
 	cout_evolution NUMBER,
 	type_elementaire varchar(31),
 	evolution varchar(32),
+	evolution_precedente varchar(32),
 	CONSTRAINT PK_Pokemon_race PRIMARY KEY (race),
-	CONSTRAINT FK_Pokemon_evol FOREIGN KEY (evolution) REFERENCES Pokemon(race) ON DELETE CASCADE
-   
+	CONSTRAINT FK_Pokemon_evol FOREIGN KEY (evolution) REFERENCES Pokemon(race) ON DELETE CASCADE,
+	CONSTRAINT FK_Pokemon_evol_prec FOREIGN KEY (evolution_precedente) REFERENCES Pokemon(race) ON DELETE CASCADE
 );
 
 CREATE TABLE Pokemon_Capture OF Pokemon_Capture_t (
        CONSTRAINT PK_PokeCapt_id PRIMARY KEY (id),
-       CONSTRAINT FK_PokeCapt_Pokemon FOREIGN KEY (race) REFERENCES Pokemon(race) 
+       CONSTRAINT FK_PokeCapt_Pokemon FOREIGN KEY (race) REFERENCES Pokemon(race)
 );
 
 CREATE TABLE Pokemon_Sauvage OF Pokemon_Sauvage_t (
