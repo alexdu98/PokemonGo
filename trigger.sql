@@ -54,43 +54,20 @@ CREATE OR REPLACE TRIGGER Check_Equipe_Pokemon_Arene
 BEFORE UPDATE ON Arene
 FOR EACH ROW
 DECLARE
-	v_equipe_dresseur Dresseur.equipe%TYPE;
-BEGIN
-	SELECT p.maitre.equipe INTO v_equipe_dresseur FROM Arene a, Table (:NEW.pokemons) p;
-	IF v_equipe_dresseur != :NEW.equipe THEN
-		RAISE_APPLICATION_ERROR(-20105, 'L''arène n''est pas de la même équipe que le dresseur.');
-	END IF;
-END;
-/
+	couleur dresseur.equipe.couleur%TYPE;
+	poke_capt_rec REF Dresseur_t;
 
-CREATE OR REPLACE TRIGGER Check_Equipe_Pokemon_Arene
-BEFORE UPDATE ON Arene
-FOR EACH ROW
-DECLARE
-	v_equipe_dresseur Dresseur.equipe%TYPE;
-	i number;
-	TYPE v_dresseurs IS TABLE OF Dresseur;
+	cursor curs_ref_poke_capt IS
+		SELECT T.column_value 
+		FROM Arene a, Table (a.pokemons) T 
+		WHERE a.id = :NEW.id;
 BEGIN
-	SELECT p.maitre INTO v_dresseurs FROM Arene a, Table(a.pokemons) p WHERE :NEW.id = a.id;
-	FOR i IN v_dresseurs.FIRST..v_dresseurs.LAST LOOP
-		SELECT v_dresseurs.EXISTS(i).equipe INTO v_equipe_dresseur FROM Arene a;
-		IF v_equipe_dresseur != :NEW.equipe THEN
-			RAISE_APPLICATION_ERROR(-20105, 'L''arène n''est pas de la même équipe que le dresseur.');
-		END IF;
-	END LOOP;
-END;
-/
+	FOR poke_capt_rec IN curs_ref_poke_capt LOOP
 
-CREATE OR REPLACE TRIGGER Check_Equipe_Pokemon_Arene
-BEFORE UPDATE ON Arene
-FOR EACH ROW
-DECLARE
-	couleur dresseur.equipe%TYPE;
-	cursor poke IS
-		SELECT T.id, T.maitre FROM Arene a, Table (a.pokemons) T WHERE :NEW.id = a.id;
-BEGIN
-	FOR i IN poke LOOP
-		SELECT d.equipe.couleur INTO couleur FROM dresseur d WHERE d.id = i.maitre.id;
+		SELECT d.equipe.couleur INTO couleur 
+		FROM Dresseur d 
+		WHERE d.id = DEREF(DEREF(poke_capt_rec.column_value).maitre).id;
+		
 		IF couleur != :NEW.equipe.couleur THEN
 			RAISE_APPLICATION_ERROR(-20105, 'aaa');
 		END IF;

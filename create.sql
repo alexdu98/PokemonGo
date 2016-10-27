@@ -114,7 +114,7 @@ CREATE OR REPLACE TYPE Pokemon_Capture_t UNDER Entite_Pokemon_t (
 );
 /
 
-CREATE OR REPLACE TYPE Liste_Pokemon AS VARRAY (250) OF Pokemon_Capture_t;
+CREATE OR REPLACE TYPE Liste_Pokemon AS VARRAY (250) OF REF Pokemon_Capture_t;
 /
 
 CREATE OR REPLACE TYPE Point_Interet_t AS OBJECT (
@@ -128,7 +128,7 @@ CREATE OR REPLACE TYPE Pokestop_t UNDER Point_Interet_t (
 );
 /
 
-CREATE OR REPLACE TYPE Liste_Defenseurs AS VARRAY (3) OF Pokemon_Capture_t;
+CREATE OR REPLACE TYPE Liste_Defenseurs AS VARRAY (3) OF REF Pokemon_Capture_t;
 /
 
 CREATE OR REPLACE TYPE Arene_t UNDER Point_Interet_t (
