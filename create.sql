@@ -17,10 +17,9 @@ DROP TABLE Bonbon CASCADE CONSTRAINTS;
 DROP TABLE Pokestop CASCADE CONSTRAINTS;
 DROP TABLE Arene CASCADE CONSTRAINTS;
 DROP TABLE Visite_Pokestop CASCADE CONSTRAINTS;
-DROP TABLE Oeufs CASCADE CONSTRAINTS;
+DROP TABLE Oeuf CASCADE CONSTRAINTS;
 
 
-DROP TYPE Couleur_t FORCE;
 DROP TYPE Dresseur_t FORCE;
 DROP TYPE Arene_t FORCE;
 DROP TYPE Liste_Defenseurs FORCE;
@@ -36,6 +35,7 @@ DROP TYPE Avatar_t FORCE;
 DROP TYPE Liste_Oeufs FORCE;
 DROP TYPE Oeuf_t FORCE;
 DROP TYPE Coordonnees_t FORCE;
+DROP TYPE Equipe_t FORCE;
 
 -- ################################################
 -- ################################################
@@ -154,14 +154,6 @@ CREATE OR REPLACE TYPE Dresseur_t AS OBJECT (
 );
 /
 
-CREATE OR REPLACE TYPE Couleur_t AS OBJECT (
-	couleur Niveau_Succes_t,
-	maitre REF Dresseur_t,
-	succes REF Succes_t
-);
-/
-
-
 -- On ajoute la référence du dresseur dans un Pokémon capturé car ils ont une référence l'un à l'autre
 ALTER TYPE Pokemon_Capture_t ADD ATTRIBUTE maitre REF Dresseur_t CASCADE;
 
@@ -251,7 +243,7 @@ CREATE TABLE Pokemon_Sauvage OF Pokemon_Sauvage_t (
 
 CREATE TABLE Bonbon (
        race_pokemon VARCHAR(32),
-	id_dresseur NUMBER,
+	   id_dresseur NUMBER,
        dresseur REF Dresseur_t,
        nb_bonbons NUMBER,
        CONSTRAINT PK_Bonbon PRIMARY KEY (race_pokemon, id_dresseur),
@@ -282,14 +274,14 @@ CREATE TABLE Visite_Pokestop (
 	CONSTRAINT FK_VisitePKS_id_pokestop FOREIGN KEY (id_pokestop) REFERENCES Pokestop(id) ON DELETE CASCADE
 
 );
-/
 
-CREATE TABLE Oeufs OF Oeufs_t (
+
+CREATE TABLE Oeuf OF Oeuf_t (
 	CONSTRAINT PK_Oeufs_ID PRIMARY KEY (id)
 );
 
 
-
+	
 -- ################################################
 -- ################################################
 
