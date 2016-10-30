@@ -104,7 +104,6 @@ CREATE OR REPLACE TYPE Pokemon_Sauvage_t UNDER Entite_Pokemon_t (
 /
 
 CREATE OR REPLACE TYPE Pokemon_Capture_t UNDER Entite_Pokemon_t (
-	cout_evolution NUMBER,
 	cp NUMBER,
 	hp NUMBER,
 	Attaques Liste_Attaques,
