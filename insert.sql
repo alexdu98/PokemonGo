@@ -62,3 +62,8 @@ INSERT INTO Oeuf VALUES (8, 1, 2, 5);
 INSERT INTO Oeuf VALUES (9, 0, 0, 2);
 --Dresseur 4
 INSERT INTO Oeuf VALUES (10, 0, 0, 5);
+
+Prompt Insertion de pokestop;
+
+INSERT INTO pokestop VALUES(1,coordonnees_t(48.873729,2.294920),'Arc de triomphe');
+INSERT INTO pokestop VALUES(2, coordonnees_t(48.865487,2.321141),'Place de la concorde');

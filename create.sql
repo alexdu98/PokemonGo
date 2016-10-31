@@ -43,10 +43,45 @@ DROP TYPE Equipe_t FORCE;
 /*
 	Création des types "simples" utilisés par d'autres types
 */
-CREATE OR REPLACE TYPE Coordonnees_t AS OBJECT (
+
+CREATE OR REPLACE TYPE Coordonnees_t AS OBJECT(
+	latitude float,
 	longitude float,
-	latitude float
+	MEMBER FUNCTION distance(coordDirection Coordonnees_t) return FLOAT,
+	STATIC FUNCTION convertRad(nb FLOAT) return FLOAT
 );
+/
+
+CREATE OR REPLACE TYPE BODY Coordonnees_t AS 
+MEMBER FUNCTION distance(coordDirection Coordonnees_t) RETURN FLOAT IS
+	rayonTerre NUMBER;
+	latA FLOAT;
+	longA FLOAT;
+	latB FLOAT;
+	longB FLOAT;
+	resultat FLOAT;
+	BEGIN
+		rayonTerre := 6378000;		
+
+		latA := Coordonnees_t.convertRad(self.latitude);
+		longA := Coordonnees_t.convertRad(self.longitude);
+		latB := Coordonnees_t.convertRad(coordDirection.latitude);
+		longB := Coordonnees_t.convertRad(coordDirection.longitude);
+
+		resultat := ACOS(SIN(latB) * SIN(latA) + COS(longB - longA) * COS(latB) * COS(latA));
+		resultat := (resultat * rayonTerre);
+		
+		RETURN resultat;
+	END distance;
+
+STATIC FUNCTION convertRad(nb FLOAT) return FLOAT IS
+	PI FLOAT;
+	begin
+		PI := 3.141592654;
+
+		RETURN ((PI * nb)/180);
+	end convertRad;
+end;
 /
 
 CREATE OR REPLACE TYPE Attaque_t AS OBJECT (
