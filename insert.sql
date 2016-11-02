@@ -7,6 +7,9 @@ DELETE FROM Item;
 DELETE FROM Pokestop;
 DELETE FROM Succes;
 DELETE FROM Pokemon_Sauvage;
+DELETE FROM Arene;
+DELETE FROM Bonbon;
+DELETE FROM Pokemon_Capture;
 
 prompt Insertion de quelques Pokemon;
 
@@ -145,3 +148,29 @@ INSERT INTO Arene VALUES(2, Coordonnees_t(43.603578, 3.915617), 'Odyseumia', Equ
 INSERT INTO Arene VALUES(3, Coordonnees_t(43.608401, 3.879314), 'Comedia', Equipe_t(''), 451, Liste_Defenseurs());
 INSERT INTO Arene VALUES(4, Coordonnees_t(48.858214, 2.292516), 'TourEiffelia', Equipe_t('jaune'), 545, Liste_Defenseurs());
 INSERT INTO Arene VALUES(5, Coordonnees_t(48.860611, 2.337644), 'MuseeLouvria', Equipe_t('rouge'), 682, Liste_Defenseurs());
+
+Prompt Insertion de pokemon capture
+INSERT INTO Pokemon_Capture VALUES(1, 'Insecateur', 100, 320,
+	Liste_Attaques(Attaque_t('Onde vide', 'combat', 40, 75), Attaque_t('Vive attaque', 'normal', 35, 70)),
+	75,
+	35,
+	(SELECT REF(D) FROM Dresseur D WHERE D.id = '1')
+);
+
+INSERT INTO Pokemon_Capture VALUES(2, 'Tortank', 100, 320,
+	Liste_Attaques(Attaque_t('Charge', 'normal', 40, 75), Attaque_t('Pistolet a O', 'eau', 45, 65)),
+	80,
+	90,
+	(SELECT REF(D) FROM Dresseur D WHERE D.id = '2')
+);
+
+INSERT INTO Pokemon_Capture VALUES(3, 'Pikachu', 100, 320,
+	Liste_Attaques(Attaque_t('Eclair', 'electrique', 40, 70), Attaque_t('Reflet', 'normal', 30, 60)),
+	50,
+	25,
+	(SELECT REF(D) FROM Dresseur D WHERE D.id = '3')
+);
+
+Prompt Insertion de bonbon
+INSERT INTO Bonbon VALUES('Pikachu', 3, (SELECT REF(D) FROM Dresseur D WHERE D.id = '3'), 5);
+INSERT INTO Bonbon VALUES('Carapuce', 2, (SELECT REF(D) FROM Dresseur D WHERE D.id = '2'), 3);
