@@ -1,11 +1,12 @@
 /* Deletion des rows pour toutes les tables */
 
 DELETE FROM Dresseur ;
-DELETE FROM Pokemon ;
-DELETE FROM Niveau ;
-DELETE FROM Item ;
-DELETE FROM Pokestop ; 
-DELETE FROM Succes ;
+DELETE FROM Pokemon;
+DELETE FROM Niveau;
+DELETE FROM Item;
+DELETE FROM Pokestop;
+DELETE FROM Succes;
+DELETE FROM Pokemon_Sauvage;
 
 prompt Insertion de quelques Pokemon;
 
@@ -56,13 +57,13 @@ INSERT INTO Item VALUES ('Hyper potion','Rend 200 points de vie.');
 INSERT INTO Item VALUES ('Baie','Rend le pokemon plus apte a etre capture.');
 
 PROMPT Insertion des succes
-INSERT INTO Succes VALUES (0, 'Joggeur', 'Parcourez X km');
-INSERT INTO Succes VALUES (1, 'Collectionneur', 'Capturez X Pokemon');
-INSERT INTO Succes VALUES (2, 'Scientifique', 'Faites evoluer X Pokemon');
-INSERT INTO Succes VALUES (3, 'Eleveur', 'Faites eclore X oeufs');
-INSERT INTO Succes VALUES (4, 'Ornithologue', 'Attrapez X Pokemon Vol');
-INSERT INTO Succes VALUES (5, 'Randonneur', 'Visiter X Pokestop');
-INSERT INTO Succes VALUES (6, 'Combattante', 'Remportez X combats en arene');
+INSERT INTO Succes VALUES (1, 'Joggeur', 'Parcourez X km');
+INSERT INTO Succes VALUES (2, 'Collectionneur', 'Capturez X Pokemon');
+INSERT INTO Succes VALUES (3, 'Scientifique', 'Faites evoluer X Pokemon');
+INSERT INTO Succes VALUES (4, 'Eleveur', 'Faites eclore X oeufs');
+INSERT INTO Succes VALUES (5, 'Ornithologue', 'Attrapez X Pokemon Vol');
+INSERT INTO Succes VALUES (6, 'Randonneur', 'Visiter X Pokestop');
+INSERT INTO Succes VALUES (7, 'Combattante', 'Remportez X combats en arene');
 
 --Dresseur 3
 -- INSERT INTO Oeuf VALUES (7, 1, 1, 5); 
@@ -98,4 +99,13 @@ INSERT INTO Dresseur VALUES (1,
 			Liste_Oeufs(Oeuf_t(3, 1, 7, 10), Oeuf_t(4, 1, 1, 2), Oeuf_t(5, 1, 8, 10), Oeuf_t(6, 0, 3, 5))
 );
 
+Prompt Insertion de pokemon sauvage;
 
+INSERT INTO Pokemon_Sauvage VALUES(1, 'Pikachu', Coordonnees_t(48.86361, 2.31198451));
+INSERT INTO Pokemon_Sauvage VALUES(2, 'Raichu', Coordonnees_t(48.984165, 2.984165));
+INSERT INTO Pokemon_Sauvage VALUES(3, 'Carapuce', Coordonnees_t(48.62512981, 2.269846));
+INSERT INTO Pokemon_Sauvage VALUES(4, 'Tortank', Coordonnees_t(47.624762762, 2.91346217));
+INSERT INTO Pokemon_Sauvage VALUES(5, 'Tortank', Coordonnees_t(48.86361, 2.31198451));
+INSERT INTO Pokemon_Sauvage VALUES(6, 'Salameche', Coordonnees_t(43.6042, 3.8836));
+INSERT INTO Pokemon_Sauvage VALUES(7, 'Florizarre', Coordonnees_t(43.615225, 3.8462453));
+INSERT INTO Pokemon_Sauvage VALUES(8, 'Insecateur', Coordonnees_t(43.628962, 3.8660557));
