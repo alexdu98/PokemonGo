@@ -1,11 +1,11 @@
 /* Deletion des rows pour toutes les tables */
 
-DELETE FROM Pokemon;
-DELETE FROM Niveau;
-DELETE FROM Item;
-DELETE FROM Oeuf;
-DELETE FROM Pokestop;
-DELETE FROM Succes;
+DELETE FROM Dresseur ;
+DELETE FROM Pokemon ;
+DELETE FROM Niveau ;
+DELETE FROM Item ;
+DELETE FROM Pokestop ; 
+DELETE FROM Succes ;
 
 prompt Insertion de quelques Pokemon;
 
@@ -64,24 +64,38 @@ INSERT INTO Succes VALUES (4, 'Ornithologue', 'Attrapez X Pokemon Vol');
 INSERT INTO Succes VALUES (5, 'Randonneur', 'Visiter X Pokestop');
 INSERT INTO Succes VALUES (6, 'Combattante', 'Remportez X combats en arene');
 
-Prompt Insertion des oeufs;
-
---Dresseur 1
-INSERT INTO Oeuf VALUES (1, 0, 2, 5); 
-INSERT INTO Oeuf VALUES (2, 0, 3, 5);
---Dresseur 2
-INSERT INTO Oeuf VALUES (3, 1, 7, 10); 
-INSERT INTO Oeuf VALUES (4, 1, 1, 2);
-INSERT INTO Oeuf VALUES (5, 1, 8, 10);
-INSERT INTO Oeuf VALUES (6, 0, 3, 5);
 --Dresseur 3
-INSERT INTO Oeuf VALUES (7, 1, 1, 5); 
-INSERT INTO Oeuf VALUES (8, 1, 2, 5);
-INSERT INTO Oeuf VALUES (9, 0, 0, 2);
+-- INSERT INTO Oeuf VALUES (7, 1, 1, 5); 
+-- INSERT INTO Oeuf VALUES (8, 1, 2, 5);
+-- INSERT INTO Oeuf VALUES (9, 0, 0, 2);
 --Dresseur 4
-INSERT INTO Oeuf VALUES (10, 0, 0, 5);
+-- INSERT INTO Oeuf VALUES (10, 0, 0, 5);
+
 
 Prompt Insertion de pokestop;
 
 INSERT INTO pokestop VALUES(1, coordonnees_t(48.873729, 2.294920),'Arc de triomphe');
 INSERT INTO pokestop VALUES(2, coordonnees_t(48.865487, 2.321141),'Place de la concorde');
+
+PROMPT Insertion de Dresseur;
+
+/* Ajout du dresseur Pierre, de ses oeufs et de ses Pokemon captures */
+INSERT INTO Dresseur VALUES (0, 
+			Avatar_t('M', 'Brun', 'Bronzee', 'Marron'), 
+			'Pierre le pecheur', 
+			Coordonnees_t(10.3, 89.5), 
+			1200, 2, '15-JUL-2016', NULL, 120, 62, 
+			NULL, 
+			Liste_Oeufs(Oeuf_t(1, 0, 2, 5), Oeuf_t(2, 0, 3, 5))
+);
+
+INSERT INTO Dresseur VALUES (1, 
+			Avatar_t('F', 'Rousse', 'Blanche', 'Vert'), 
+			'Ondine a bicyclette', 
+			Coordonnees_t(26.8, 42.5), 
+			11000, 5, '02-JUL-2016', Equipe_t('rouge'), 120, 62, 
+			NULL, 
+			Liste_Oeufs(Oeuf_t(3, 1, 7, 10), Oeuf_t(4, 1, 1, 2), Oeuf_t(5, 1, 8, 10), Oeuf_t(6, 0, 3, 5))
+);
+
+

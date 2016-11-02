@@ -17,8 +17,6 @@ DROP TABLE Bonbon CASCADE CONSTRAINTS;
 DROP TABLE Pokestop CASCADE CONSTRAINTS;
 DROP TABLE Arene CASCADE CONSTRAINTS;
 DROP TABLE Visite_Pokestop CASCADE CONSTRAINTS;
-DROP TABLE Oeuf CASCADE CONSTRAINTS;
-
 
 DROP TYPE Dresseur_t FORCE;
 DROP TYPE Arene_t FORCE;
@@ -191,6 +189,8 @@ CREATE OR REPLACE TYPE Dresseur_t AS OBJECT (
 -- On ajoute la référence du dresseur dans un Pokémon capturé car ils ont une référence l'un à l'autre
 ALTER TYPE Pokemon_Capture_t ADD ATTRIBUTE maitre REF Dresseur_t CASCADE;
 
+
+
 -- ################################################
 -- ################################################
 
@@ -310,12 +310,6 @@ CREATE TABLE Visite_Pokestop (
 );
 
 
-CREATE TABLE Oeuf OF Oeuf_t (
-	CONSTRAINT PK_Oeufs_ID PRIMARY KEY (id)
-);
-
-
-	
 -- ################################################
 -- ################################################
 

@@ -17,7 +17,10 @@ FOR EACH ROW
 DECLARE
 	v_nb_oeufs number;
 BEGIN
-	SELECT COUNT(o.incubation) INTO v_nb_oeufs FROM Dresseur d, Table (d.oeufs) o WHERE :NEW.id = d.id AND o.incubation = 1;
+	SELECT COUNT(o.incubation) INTO v_nb_oeufs 
+	FROM Dresseur d, Table (d.oeufs) o 
+	WHERE :NEW.id = d.id AND o.incubation = 1;
+	
 	IF v_nb_oeufs > 3 THEN
 		RAISE_APPLICATION_ERROR(-20102, 'Nombre d''oeufs incubés maximum atteint.');
 	END IF;
