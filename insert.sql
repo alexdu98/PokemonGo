@@ -1,3 +1,12 @@
+/* Deletion des rows pour toutes les tables */
+
+DELETE FROM Pokemon;
+DELETE FROM Niveau;
+DELETE FROM Item;
+DELETE FROM Oeuf;
+DELETE FROM Pokestop;
+DELETE FROM Succes;
+
 prompt Insertion de quelques Pokemon;
 
 INSERT INTO Pokemon VALUES ('Pikachu', 50, 'electrique', NULL, NULL);
@@ -18,10 +27,10 @@ INSERT INTO Pokemon VALUES ('Florizarre', 0,'Plante',NULL,'Herbizarre');
 UPDATE Pokemon SET evolution = 'Herbizarre' WHERE race = 'Bulbizarre';
 UPDATE Pokemon SET evolution = 'Florizarre' WHERE race = 'Herbizarre';
 
-INSERT INTO Pokemon VALUES ('Salamèche', 25, 'Feu', NULL,NULL);
-INSERT INTO Pokemon VALUES ('Reptincel', 50, 'Feu',NULL,'Salamèche');
+INSERT INTO Pokemon VALUES ('Salameche', 25, 'Feu', NULL,NULL);
+INSERT INTO Pokemon VALUES ('Reptincel', 50, 'Feu',NULL,'Salameche');
 INSERT INTO Pokemon VALUES ('Dracaufeu', 0, 'Feu',NULL, 'Reptincel');
-UPDATE Pokemon SET evolution = 'Reptincel' WHERE race = 'Salamèche';
+UPDATE Pokemon SET evolution = 'Reptincel' WHERE race = 'Salameche';
 UPDATE Pokemon SET evolution = 'Dracaufeu' WHERE race = 'Reptincel';
 
 Prompt Insertion des niveaux;
@@ -44,7 +53,16 @@ INSERT INTO Item VALUES ('Leurre','Attire les pokemons sur un pokestop pour tous
 INSERT INTO Item VALUES ('Potion','Rend 20 points de vie.');
 INSERT INTO Item VALUES ('Super potion','Rend 50 points de vie.');
 INSERT INTO Item VALUES ('Hyper potion','Rend 200 points de vie.');
-INSERT INTO Item VALUES ('Baie','Rend le pokemon plus apte à être capturé.');
+INSERT INTO Item VALUES ('Baie','Rend le pokemon plus apte a etre capture.');
+
+PROMPT Insertion des succes
+INSERT INTO Succes VALUES (0, 'Joggeur', 'Parcourez X km');
+INSERT INTO Succes VALUES (1, 'Collectionneur', 'Capturez X Pokemon');
+INSERT INTO Succes VALUES (2, 'Scientifique', 'Faites evoluer X Pokemon');
+INSERT INTO Succes VALUES (3, 'Eleveur', 'Faites eclore X oeufs');
+INSERT INTO Succes VALUES (4, 'Ornithologue', 'Attrapez X Pokemon Vol');
+INSERT INTO Succes VALUES (5, 'Randonneur', 'Visiter X Pokestop');
+INSERT INTO Succes VALUES (6, 'Combattante', 'Remportez X combats en arene');
 
 Prompt Insertion des oeufs;
 
@@ -65,5 +83,5 @@ INSERT INTO Oeuf VALUES (10, 0, 0, 5);
 
 Prompt Insertion de pokestop;
 
-INSERT INTO pokestop VALUES(1,coordonnees_t(48.873729,2.294920),'Arc de triomphe');
-INSERT INTO pokestop VALUES(2, coordonnees_t(48.865487,2.321141),'Place de la concorde');
+INSERT INTO pokestop VALUES(1, coordonnees_t(48.873729, 2.294920),'Arc de triomphe');
+INSERT INTO pokestop VALUES(2, coordonnees_t(48.865487, 2.321141),'Place de la concorde');
