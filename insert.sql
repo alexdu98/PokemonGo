@@ -287,3 +287,37 @@ INSERT INTO Visite_Pokestop VALUES (TO_TIMESTAMP('10-OCT-2016 8:30', 'DD-MON-YYY
 INSERT INTO Visite_Pokestop VALUES (TO_TIMESTAMP('23-SEP-2016 9:45', 'DD-MON-YYYY HH24:MI'), 5, 5,
        (SELECT REF(d) FROM Dresseur d WHERE d.id = 5),
        (SELECT REF(ps) FROM Pokestop ps WHERE ps.id = 5));
+
+
+Prompt Insertion des avancements succes;
+INSERT INTO Avancement_Succes VALUES (1,1,(SELECT REF(d) FROM Dresseur d WHERE d.id = 1),'bronze');
+INSERT INTO Avancement_Succes VALUES (2,1,(SELECT REF(d) FROM Dresseur d WHERE d.id = 1),'bronze');
+INSERT INTO Avancement_Succes VALUES (3,1,(SELECT REF(d) FROM Dresseur d WHERE d.id = 1),'argent');
+INSERT INTO Avancement_Succes VALUES (4,1,(SELECT REF(d) FROM Dresseur d WHERE d.id = 1),'or');
+INSERT INTO Avancement_Succes VALUES (2,2,(SELECT REF(d) FROM Dresseur d WHERE d.id = 2),'argent');
+INSERT INTO Avancement_Succes VALUES (4,2,(SELECT REF(d) FROM Dresseur d WHERE d.id = 2),'bronze');
+INSERT INTO Avancement_Succes VALUES (6,2,(SELECT REF(d) FROM Dresseur d WHERE d.id = 2),'argent');
+
+Prompt Insertion dans posseder_item;
+INSERT INTO posseder_item VALUES('Pokeball', 1, (SELECT REF(d) FROM Dresseur d WHERE d.id = 1),50);
+INSERT INTO posseder_item VALUES('Encens', 1, (SELECT REF(d) FROM Dresseur d WHERE d.id = 1),5);
+INSERT INTO posseder_item VALUES('Leurre', 1, (SELECT REF(d) FROM Dresseur d WHERE d.id = 1),10);
+INSERT INTO posseder_item VALUES('Potion', 1, (SELECT REF(d) FROM Dresseur d WHERE d.id = 1),70);
+INSERT INTO posseder_item VALUES('Pokeball', 2, (SELECT REF(d) FROM Dresseur d WHERE d.id = 2),70);
+INSERT INTO posseder_item VALUES('Baie', 2, (SELECT REF(d) FROM Dresseur d WHERE d.id = 2),50);
+INSERT INTO posseder_item VALUES('Leurre', 2, (SELECT REF(d) FROM Dresseur d WHERE d.id = 2),3);
+INSERT INTO posseder_item VALUES('Potion', 2, (SELECT REF(d) FROM Dresseur d WHERE d.id = 2),100);
+INSERT INTO posseder_item VALUES('Pokeball', 3, (SELECT REF(d) FROM Dresseur d WHERE d.id = 3),50);
+INSERT INTO posseder_item VALUES('Encens', 3, (SELECT REF(d) FROM Dresseur d WHERE d.id = 3),5);
+INSERT INTO posseder_item VALUES('Leurre', 3, (SELECT REF(d) FROM Dresseur d WHERE d.id = 3),10);
+INSERT INTO posseder_item VALUES('Hyper potion', 3, (SELECT REF(d) FROM Dresseur d WHERE d.id = 3),70);
+INSERT INTO posseder_item VALUES('Pokeball', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),150);
+INSERT INTO posseder_item VALUES('Encens', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),5);
+INSERT INTO posseder_item VALUES('Baie', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),100);
+INSERT INTO posseder_item VALUES('Super potion', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),70);
+
+Prompt Ce trigger doit se declencher;
+INSERT INTO posseder_item VALUES('Leurre', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),100);
+
+Prompt ici aussi;
+UPDATE posseder_item SET nb_item = 200 where type_item = 'Baie' AND id_dresseur = 4;
