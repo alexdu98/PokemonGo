@@ -252,11 +252,17 @@ INSERT INTO Bonbon VALUES('Pikachu', 3, (SELECT REF(D) FROM Dresseur D WHERE D.i
 INSERT INTO Bonbon VALUES('Carapuce', 2, (SELECT REF(D) FROM Dresseur D WHERE D.id = 2), 3);
 
 Prompt Insertion d arenes;
-INSERT INTO Arene VALUES(1, Coordonnees_t(43.635765, 3.847425), 'Occitania', Equipe_t('bleu'), 210, Liste_Defenseurs());
-INSERT INTO Arene VALUES(2, Coordonnees_t(43.603578, 3.915617), 'Odyseumia', Equipe_t('rouge'), 256, Liste_Defenseurs());
+INSERT INTO Arene VALUES(1, Coordonnees_t(43.635765, 3.847425), 'Occitania', Equipe_t('bleu'), 210, Liste_Defenseurs(
+	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 3)));
+INSERT INTO Arene VALUES(2, Coordonnees_t(43.603578, 3.915617), 'Odyseumia', Equipe_t('rouge'), 256, Liste_Defenseurs(
+	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 2),
+	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 5)));
 INSERT INTO Arene VALUES(3, Coordonnees_t(43.608401, 3.879314), 'Comedia', Equipe_t(''), 451, Liste_Defenseurs());
-INSERT INTO Arene VALUES(4, Coordonnees_t(48.858214, 2.292516), 'TourEiffelia', Equipe_t('jaune'), 545, Liste_Defenseurs());
-INSERT INTO Arene VALUES(5, Coordonnees_t(48.860611, 2.337644), 'MuseeLouvria', Equipe_t('rouge'), 682, Liste_Defenseurs());
+INSERT INTO Arene VALUES(4, Coordonnees_t(48.858214, 2.292516), 'TourEiffelia', Equipe_t('jaune'), 545, Liste_Defenseurs(
+	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 9)));
+INSERT INTO Arene VALUES(5, Coordonnees_t(48.860611, 2.337644), 'MuseeLouvria', Equipe_t('rouge'), 682, Liste_Defenseurs(
+	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 7),
+	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 10)));
 
 Prompt Insertion de pokestop;
 
@@ -316,10 +322,10 @@ INSERT INTO posseder_item VALUES('Encens', 4, (SELECT REF(d) FROM Dresseur d WHE
 INSERT INTO posseder_item VALUES('Baie', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),100);
 INSERT INTO posseder_item VALUES('Super potion', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),70);
 
-Prompt Un trigger sé déclenche et fixe le maximum d objets;
+Prompt Un trigger se déclenche et fixe le maximum d objets;
 INSERT INTO posseder_item VALUES('Leurre', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),100);
 
-Prompt ici aussi;
+Prompt declenche le trigger, et genere une erreur;
 UPDATE posseder_item SET nb_item = 200 where type_item = 'Baie' AND id_dresseur = 4;
 
 Prompt on diminue le nombre de baie pour le dresseur 4;
