@@ -320,8 +320,11 @@ BEGIN
 	   	
 	ELSIF v_nb_items + :NEW.nb_item > 350 THEN
 
-	   :NEW.nb_item := :NEW.nb_item + (350 - v_nb_items);
-	   
+	      IF INSERTING THEN
+	      	 :NEW.nb_item := 350 - v_nb_items;
+	      ELSE
+		 :NEW.nb_item := :OLD.nb_item + (350 - v_nb_items);
+	      END IF;
 	END IF;
 
 	
