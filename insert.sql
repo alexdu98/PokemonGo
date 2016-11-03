@@ -316,8 +316,11 @@ INSERT INTO posseder_item VALUES('Encens', 4, (SELECT REF(d) FROM Dresseur d WHE
 INSERT INTO posseder_item VALUES('Baie', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),100);
 INSERT INTO posseder_item VALUES('Super potion', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),70);
 
-Prompt Ce trigger doit se declencher;
+Prompt Un trigger sé déclenche et fixe le maximum d objets;
 INSERT INTO posseder_item VALUES('Leurre', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),100);
 
 Prompt ici aussi;
 UPDATE posseder_item SET nb_item = 200 where type_item = 'Baie' AND id_dresseur = 4;
+
+Prompt on diminue le nombre de baie pour le dresseur 4;
+UPDATE posseder_item SET nb_item = 25 where type_item = 'Baie' AND id_dresseur = 4;

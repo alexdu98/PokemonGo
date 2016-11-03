@@ -314,23 +314,44 @@ BEGIN
 	FROM Dresseur d
 	WHERE :NEW.id_dresseur = d.id;
 
-	IF v_nb_items = 350 THEN
-	
-	   RAISE_APPLICATION_ERROR(-20101, 'Nombre d''items maximum atteint.');
-	   	
-	ELSIF v_nb_items + :NEW.nb_item > 350 THEN
+	IF UPDATING THEN
+		
+		IF :OLD.nb_item > :NEW.nb_item THEN
 
-	      IF INSERTING THEN
-	      	 :NEW.nb_item := 350 - v_nb_items;
-	      ELSE
-		 :NEW.nb_item := :OLD.nb_item + (350 - v_nb_items);
-	      END IF;
+			UPDATE Dresseur
+			SET nbitems = v_nb_items - :OLD.nb_item + :NEW.nb_item
+			WHERE id = :NEW.id_dresseur;
+
+		ELSE 
+			IF v_nb_items = 350 THEN
+	
+		   		RAISE_APPLICATION_ERROR(-20101, 'Nombre d''items maximum atteint.');
+
+			ELSIF v_nb_items - :OLD.nb_item + :NEW.nb_item > 350 THEN
+				:NEW.nb_item := 350 - (v_nb_items - :OLD.nb_item);			
+
+			END IF;
+		END IF;			
+
+		UPDATE Dresseur
+		SET nbitems = v_nb_items - :OLD.nb_item + :NEW.nb_item
+		WHERE id = :NEW.id_dresseur;
+
+	ELSE
+		IF v_nb_items = 350 THEN
+	
+		   RAISE_APPLICATION_ERROR(-20101, 'Nombre d''items maximum atteint.');
+		   	
+		ELSIF v_nb_items + :NEW.nb_item > 350 THEN
+   			:NEW.nb_item := 350 - v_nb_items;
+
+		END IF;
+
+		UPDATE Dresseur
+		SET nbitems = v_nb_items + :NEW.nb_item
+		WHERE id = :NEW.id_dresseur;
+
 	END IF;
-
-	
-	UPDATE Dresseur
-	SET nbitems = nbitems + :NEW.nb_item
-	WHERE id = :NEW.id_dresseur;
 
 END;
 /
