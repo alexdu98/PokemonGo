@@ -6,6 +6,7 @@ DELETE FROM Pokemon_Sauvage;
 DELETE FROM Pokemon;
 DELETE FROM Niveau;
 DELETE FROM Item;
+DELETE FROM Visite_Pokestop;
 DELETE FROM Pokestop;
 DELETE FROM Succes;
 DELETE FROM Arene;
@@ -81,13 +82,6 @@ INSERT INTO Succes VALUES (5, 'Ornithologue', 'Attrapez X Pokemon Vol');
 INSERT INTO Succes VALUES (6, 'Randonneur', 'Visiter X Pokestop');
 INSERT INTO Succes VALUES (7, 'Combattante', 'Remportez X combats en arene');
 
-Prompt Insertion de pokestop;
-
-INSERT INTO pokestop VALUES(1, coordonnees_t(48.873729, 2.294920), 'Arc de triomphe');
-INSERT INTO pokestop VALUES(2, coordonnees_t(48.865487, 2.321141), 'Place de la concorde');
-INSERT INTO pokestop VALUES(3, coordonnees_t(43.631789, 3.866898), 'Faculte des Sciences de Montpellier');
-INSERT INTO pokestop VALUES(4, coordonnees_t(43.618999, 3.869439), 'Stade Philipides de Montpellier');
-INSERT INTO pokestop VALUES(5, coordonnees_t(46.72658, 2.485807), 'Gare d''Orval');
 
 PROMPT Insertion de Dresseur;
 
@@ -96,45 +90,40 @@ INSERT INTO Dresseur VALUES (1,
 			Avatar_t('M', 'Brun', 'Bronzee', 'Marron'), 
 			'Pierre', 
 			Coordonnees_t(10.3, 89.5), 
-			1200, 2, '01-JUL-2016', NULL, 120, 62, 
-			NULL, 
-			Liste_Oeufs(Oeuf_t(0, 2, 5), Oeuf_t(0, 3, 5))
+			1200, 2, '01-JUL-2016', NULL, 120, 62, 0, 
+			NULL
 );
 
 INSERT INTO Dresseur VALUES (2, 
 			Avatar_t('F', 'Rousse', 'Blanche', 'Vert'), 
 			'Ondine', 
 			Coordonnees_t(26.8, 42.5), 
-			11000, 5, '04-JUL-2016', Equipe_t('rouge'), 120, 62, 
-			NULL, 
-			Liste_Oeufs(Oeuf_t(1, 7, 10), Oeuf_t(1, 1, 2), Oeuf_t(1, 8, 10), Oeuf_t(0, 3, 5))
+			11000, 5, '04-JUL-2016', Equipe_t('rouge'), 120, 62, 0, 
+			NULL 
 );
 
 INSERT INTO Dresseur VALUES(3,
 			Avatar_t('M', 'Brun', 'Blanche', 'Marron'), 
 			'Sacha', 
 			Coordonnees_t(43.60357, 3.91561),
-			12000, 5, '15-JUL-2016', Equipe_t('bleu'), 100, 10,
-			NULL,
-			Liste_Oeufs(Oeuf_t(1, 8, 10), Oeuf_t(0, 0, 2))
+			12000, 5, '15-JUL-2016', Equipe_t('bleu'), 100, 10, 0,
+			NULL
 );
 
 INSERT INTO Dresseur VALUES(4,
 			Avatar_t('M', 'Blond', 'Noir', 'Marron'), 
 			'Zaakary', 
 			Coordonnees_t(48.860611, 2.337644),
-			37000, 9, '15-JUL-2016', Equipe_t('jaune'), 0, 0,
-			NULL,
-			Liste_Oeufs(Oeuf_t(0, 0, 5))
+			37000, 9, '15-JUL-2016', Equipe_t('jaune'), 0, 0, 0,
+			NULL
 );
 
 INSERT INTO Dresseur VALUES(5,
 			Avatar_t('F', 'Brunne', 'Blanche', 'Bleu'), 
 			'Agatha', 
 			Coordonnees_t(46.435453, 3.054045),
-			20000, 6, '29-JUL-2016', Equipe_t('rouge'), 52, 0,
-			NULL,
-			Liste_Oeufs(Oeuf_t(1, 2, 25))
+			20000, 6, '29-JUL-2016', Equipe_t('rouge'), 52, 0, 0,
+			NULL
 );
 
 Prompt Insertion de pokemon sauvage;
@@ -147,12 +136,6 @@ INSERT INTO Pokemon_Sauvage VALUES(6, 'Salameche', Coordonnees_t(43.6042, 3.8836
 INSERT INTO Pokemon_Sauvage VALUES(7, 'Florizarre', Coordonnees_t(43.615225, 3.8462453));
 INSERT INTO Pokemon_Sauvage VALUES(8, 'Insecateur', Coordonnees_t(43.628962, 3.8660557));
 
-Prompt Insertion d arenes;
-INSERT INTO Arene VALUES(1, Coordonnees_t(43.635765, 3.847425), 'Occitania', Equipe_t('bleu'), 210, Liste_Defenseurs());
-INSERT INTO Arene VALUES(2, Coordonnees_t(43.603578, 3.915617), 'Odyseumia', Equipe_t('rouge'), 256, Liste_Defenseurs());
-INSERT INTO Arene VALUES(3, Coordonnees_t(43.608401, 3.879314), 'Comedia', Equipe_t(''), 451, Liste_Defenseurs());
-INSERT INTO Arene VALUES(4, Coordonnees_t(48.858214, 2.292516), 'TourEiffelia', Equipe_t('jaune'), 545, Liste_Defenseurs());
-INSERT INTO Arene VALUES(5, Coordonnees_t(48.860611, 2.337644), 'MuseeLouvria', Equipe_t('rouge'), 682, Liste_Defenseurs());
 
 Prompt Insertion de pokemon capture
 INSERT INTO Pokemon_Capture VALUES(1, 'Insecateur', 100, 320,
@@ -264,8 +247,43 @@ SET d.pokemons = (SELECT CAST(COLLECT(REF(pc)) as Liste_Pokemon)
 WHERE d.id = 5;
 
 
-Prompt Insertion de bonbon
+PROMPT Insertion de bonbon
 INSERT INTO Bonbon VALUES('Pikachu', 3, (SELECT REF(D) FROM Dresseur D WHERE D.id = 3), 5);
 INSERT INTO Bonbon VALUES('Carapuce', 2, (SELECT REF(D) FROM Dresseur D WHERE D.id = 2), 3);
 
+Prompt Insertion d arenes;
+INSERT INTO Arene VALUES(1, Coordonnees_t(43.635765, 3.847425), 'Occitania', Equipe_t('bleu'), 210, Liste_Defenseurs());
+INSERT INTO Arene VALUES(2, Coordonnees_t(43.603578, 3.915617), 'Odyseumia', Equipe_t('rouge'), 256, Liste_Defenseurs());
+INSERT INTO Arene VALUES(3, Coordonnees_t(43.608401, 3.879314), 'Comedia', Equipe_t(''), 451, Liste_Defenseurs());
+INSERT INTO Arene VALUES(4, Coordonnees_t(48.858214, 2.292516), 'TourEiffelia', Equipe_t('jaune'), 545, Liste_Defenseurs());
+INSERT INTO Arene VALUES(5, Coordonnees_t(48.860611, 2.337644), 'MuseeLouvria', Equipe_t('rouge'), 682, Liste_Defenseurs());
 
+Prompt Insertion de pokestop;
+
+INSERT INTO pokestop VALUES(1, coordonnees_t(48.873729, 2.294920), 'Arc de triomphe');
+INSERT INTO pokestop VALUES(2, coordonnees_t(48.865487, 2.321141), 'Place de la concorde');
+INSERT INTO pokestop VALUES(3, coordonnees_t(43.631789, 3.866898), 'Faculte des Sciences de Montpellier');
+INSERT INTO pokestop VALUES(4, coordonnees_t(43.618999, 3.869439), 'Stade Philipides de Montpellier');
+INSERT INTO pokestop VALUES(5, coordonnees_t(46.72658, 2.485807), 'Gare d''Orval');
+
+
+PROMPT Insertion Visite_Pokestop
+INSERT INTO Visite_Pokestop VALUES (TO_TIMESTAMP('12-JUL-2016 12:30', 'DD-MON-YYYY HH24:MI'), 1, 1,
+       (SELECT REF(d) FROM Dresseur d WHERE d.id = 1),
+       (SELECT REF(ps) FROM Pokestop ps WHERE ps.id = 1));
+
+INSERT INTO Visite_Pokestop VALUES (TO_TIMESTAMP('3-NOV-2016 12:30', 'DD-MON-YYYY HH24:MI'), 2, 2,
+       (SELECT REF(d) FROM Dresseur d WHERE d.id = 2),
+       (SELECT REF(ps) FROM Pokestop ps WHERE ps.id = 2));
+
+INSERT INTO Visite_Pokestop VALUES (TO_TIMESTAMP('25-OCT-2016 15:30', 'DD-MON-YYYY HH24:MI'), 3, 3,
+       (SELECT REF(d) FROM Dresseur d WHERE d.id = 3),
+       (SELECT REF(ps) FROM Pokestop ps WHERE ps.id = 3));
+
+INSERT INTO Visite_Pokestop VALUES (TO_TIMESTAMP('10-OCT-2016 8:30', 'DD-MON-YYYY HH24:MI'), 4, 4,
+       (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),
+       (SELECT REF(ps) FROM Pokestop ps WHERE ps.id = 4));
+
+INSERT INTO Visite_Pokestop VALUES (TO_TIMESTAMP('23-SEP-2016 9:45', 'DD-MON-YYYY HH24:MI'), 5, 5,
+       (SELECT REF(d) FROM Dresseur d WHERE d.id = 5),
+       (SELECT REF(ps) FROM Pokestop ps WHERE ps.id = 5));

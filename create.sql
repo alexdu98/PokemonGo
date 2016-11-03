@@ -1,4 +1,5 @@
-set sqlblanklines on
+SET sqlblanklines ON
+
 /*
 	Suppression de tous les types et
 	de toutes les tables.
@@ -30,8 +31,6 @@ DROP TYPE Entite_Pokemon_t FORCE;
 DROP TYPE Liste_attaques FORCE;
 DROP TYPE Attaque_t FORCE;
 DROP TYPE Avatar_t FORCE;
-DROP TYPE Liste_Oeufs FORCE;
-DROP TYPE Oeuf_t FORCE;
 DROP TYPE Coordonnees_t FORCE;
 DROP TYPE Equipe_t FORCE;
 
@@ -113,17 +112,6 @@ CREATE OR REPLACE TYPE Equipe_t AS OBJECT (
 	Création des autres types
 */
 
-
-CREATE OR REPLACE TYPE Oeuf_t AS OBJECT (
-	incubation number(1),
-	km_parcourus NUMBER,
-	km_eclosion NUMBER
-);
-/
-
-CREATE OR REPLACE TYPE Liste_Oeufs AS VARRAY (9) OF Oeuf_t;
-/
-
 CREATE OR REPLACE TYPE Entite_Pokemon_t AS OBJECT (
        id NUMBER,
        race varchar(32)
@@ -180,8 +168,8 @@ CREATE OR REPLACE TYPE Dresseur_t AS OBJECT (
 	equipe Equipe_t,
 	pokecoins NUMBER,
 	stardusts NUMBER,
-	pokemons Liste_Pokemon,
-	oeufs Liste_Oeufs
+	nbitems NUMBER,
+	pokemons Liste_Pokemon
 );
 /
 
@@ -295,7 +283,7 @@ CREATE TABLE Arene OF Arene_t (
 );
 
 CREATE TABLE Visite_Pokestop (
-	date_derniere_visite DATE,
+	date_derniere_visite TIMESTAMP,
 	id_dresseur NUMBER,
 	id_pokestop NUMBER,
 	dresseur REF Dresseur_t,
@@ -316,45 +304,46 @@ CREATE TABLE Visite_Pokestop (
 	Création des triggers de vérification des contraintes
 */
 CREATE OR REPLACE TRIGGER Check_Nombre_Item
-AFTER INSERT OR UPDATE ON Posseder_Item
+BEFORE INSERT OR UPDATE ON Posseder_Item
 FOR EACH ROW
 DECLARE
 	v_nb_items number;
 BEGIN
-	SELECT SUM(PI.nb_item) INTO v_nb_items FROM Posseder_Item PI WHERE :NEW.id_dresseur = PI.id_dresseur;
-	IF v_nb_items > 350 THEN
-		RAISE_APPLICATION_ERROR(-20101, 'Nombre d''items maximum atteint.');
+	SELECT d.nbitems INTO v_nb_items
+	FROM Dresseur d
+	WHERE :NEW.id_dresseur = d.id;
+
+	IF v_nb_items = 350 THEN
+	
+	   RAISE_APPLICATION_ERROR(-20101, 'Nombre d''items maximum atteint.');
+
+	ELSE	      
+	   	IF INSERTING THEN
+		   INSERT INTO Posseder_item
+		   VALUES (:NEW.type_item, :NEW.id_dresseur, :NEW.dresseur, 350 - v_nb_items);
+		ELSE
+			UPDATE Posseder_item
+			SET nb_item = 350 - v_nb_items
+			WHERE type_item = :OLD.type_item AND id_dresseur = :OLD.id_dresseur;
+			
+		END IF;
 	END IF;
 END;
 /
-
-
--- CREATE OR REPLACE TRIGGER Check_Nombre_Oeufs_Incube
--- AFTER INSERT OR UPDATE ON Dresseur
--- FOR EACH ROW
--- DECLARE
---	v_nb_oeufs number;
--- BEGIN
--- 	SELECT COUNT(*) INTO v_nb_oeufs
--- 	FROM Dresseur d, Table (d.oeufs) o
--- 	WHERE :NEW.id = d.id AND o.incubation = 1;
-
--- 	IF v_nb_oeufs > 3 THEN
--- 		RAISE_APPLICATION_ERROR(-20102, 'Nombre d''oeufs incubés maximum atteint.');
--- 	END IF;
--- END;
--- /
-
 
 CREATE OR REPLACE TRIGGER Check_Derniere_Visite_Pokestop
 BEFORE UPDATE ON Visite_Pokestop
 FOR EACH ROW
 DECLARE
-	v_date_derniere_visite date;
+	v_date_derniere_visite TIMESTAMP;
 BEGIN
-	SELECT VP.date_derniere_visite INTO v_date_derniere_visite FROM Visite_Pokestop VP WHERE :NEW.id_dresseur = VP.id_dresseur AND :NEW.id_pokestop = VP.id_pokestop;
+	SELECT VP.date_derniere_visite INTO v_date_derniere_visite
+	FROM Visite_Pokestop VP
+	WHERE :NEW.id_dresseur = VP.id_dresseur AND :NEW.id_pokestop = VP.id_pokestop;
+
+	
 	IF v_date_derniere_visite > (SYSDATE - 5/2880) THEN
-		RAISE_APPLICATION_ERROR(-20103, 'Vous avec déjà visité ce pokestop il y a moins de 5 minutes.');
+		RAISE_APPLICATION_ERROR(-20103, 'Vous avez déjà visité ce pokestop il y a moins de 5 minutes.');
 	END IF;
 END;
 /
