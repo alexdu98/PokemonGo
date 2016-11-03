@@ -390,7 +390,7 @@ END;
 /
 
 CREATE OR REPLACE TRIGGER Check_Equipe_Pokemon_Arene
-BEFORE UPDATE ON Arene
+BEFORE UPDATE OR INSERT ON Arene
 FOR EACH ROW
 DECLARE
 	couleur dresseur.equipe.couleur%TYPE;
@@ -398,8 +398,8 @@ DECLARE
 
 	cursor curs_ref_poke_capt IS
 		SELECT T.column_value 
-		FROM Arene a, Table (a.pokemons) T 
-		WHERE a.id = :NEW.id;
+		FROM Table (:NEW.pokemons) T;
+		
 BEGIN
 	FOR poke_capt_rec IN curs_ref_poke_capt LOOP
 

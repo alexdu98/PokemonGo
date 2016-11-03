@@ -253,16 +253,26 @@ INSERT INTO Bonbon VALUES('Carapuce', 2, (SELECT REF(D) FROM Dresseur D WHERE D.
 
 Prompt Insertion d arenes;
 INSERT INTO Arene VALUES(1, Coordonnees_t(43.635765, 3.847425), 'Occitania', Equipe_t('bleu'), 210, Liste_Defenseurs(
-	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 3)));
+	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 3),
+	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 2)));
+
 INSERT INTO Arene VALUES(2, Coordonnees_t(43.603578, 3.915617), 'Odyseumia', Equipe_t('rouge'), 256, Liste_Defenseurs(
 	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 2),
 	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 5)));
+
 INSERT INTO Arene VALUES(3, Coordonnees_t(43.608401, 3.879314), 'Comedia', Equipe_t(''), 451, Liste_Defenseurs());
+
 INSERT INTO Arene VALUES(4, Coordonnees_t(48.858214, 2.292516), 'TourEiffelia', Equipe_t('jaune'), 545, Liste_Defenseurs(
 	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 9)));
+
 INSERT INTO Arene VALUES(5, Coordonnees_t(48.860611, 2.337644), 'MuseeLouvria', Equipe_t('rouge'), 682, Liste_Defenseurs(
 	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 7),
 	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 10)));
+
+-- UPDATE Arene
+-- SET pokemons = Liste_Defenseurs((SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 2))
+-- WHERE id = 1; 
+
 
 Prompt Insertion de pokestop;
 
