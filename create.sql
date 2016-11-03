@@ -115,7 +115,6 @@ CREATE OR REPLACE TYPE Equipe_t AS OBJECT (
 
 
 CREATE OR REPLACE TYPE Oeuf_t AS OBJECT (
-	id NUMBER,
 	incubation number(1),
 	km_parcourus NUMBER,
 	km_eclosion NUMBER
@@ -329,18 +328,23 @@ BEGIN
 END;
 /
 
-CREATE OR REPLACE TRIGGER Check_Nombre_Oeufs_Incube
-AFTER INSERT OR UPDATE ON Dresseur
-FOR EACH ROW
-DECLARE
-	v_nb_oeufs number;
-BEGIN
-	SELECT COUNT(o.incubation) INTO v_nb_oeufs FROM Dresseur d, Table (d.oeufs) o WHERE :NEW.id = d.id AND o.incubation = 1;
-	IF v_nb_oeufs > 3 THEN
-		RAISE_APPLICATION_ERROR(-20102, 'Nombre d''oeufs incubés maximum atteint.');
-	END IF;
-END;
-/
+
+-- CREATE OR REPLACE TRIGGER Check_Nombre_Oeufs_Incube
+-- AFTER INSERT OR UPDATE ON Dresseur
+-- FOR EACH ROW
+-- DECLARE
+--	v_nb_oeufs number;
+-- BEGIN
+-- 	SELECT COUNT(*) INTO v_nb_oeufs
+-- 	FROM Dresseur d, Table (d.oeufs) o
+-- 	WHERE :NEW.id = d.id AND o.incubation = 1;
+
+-- 	IF v_nb_oeufs > 3 THEN
+-- 		RAISE_APPLICATION_ERROR(-20102, 'Nombre d''oeufs incubés maximum atteint.');
+-- 	END IF;
+-- END;
+-- /
+
 
 CREATE OR REPLACE TRIGGER Check_Derniere_Visite_Pokestop
 BEFORE UPDATE ON Visite_Pokestop
@@ -387,7 +391,7 @@ BEGIN
 		WHERE d.id = DEREF(DEREF(poke_capt_rec.column_value).maitre).id;
 		
 		IF couleur != :NEW.equipe.couleur THEN
-			RAISE_APPLICATION_ERROR(-20105, 'aaa');
+			RAISE_APPLICATION_ERROR(-20105, 'Le Pokemon ne fait pas partie de la meme equipe que l''arene');
 		END IF;
 	END LOOP;
 END;

@@ -1,15 +1,16 @@
 /* Deletion des rows pour toutes les tables */
 
 DELETE FROM Dresseur;
+DELETE FROM Pokemon_Capture;
+DELETE FROM Pokemon_Sauvage;
 DELETE FROM Pokemon;
 DELETE FROM Niveau;
 DELETE FROM Item;
 DELETE FROM Pokestop;
 DELETE FROM Succes;
-DELETE FROM Pokemon_Sauvage;
 DELETE FROM Arene;
 DELETE FROM Bonbon;
-DELETE FROM Pokemon_Capture;
+
 
 prompt Insertion de quelques Pokemon;
 
@@ -37,7 +38,18 @@ INSERT INTO Pokemon VALUES ('Dracaufeu', 0, 'Feu', NULL, 'Reptincel');
 UPDATE Pokemon SET evolution = 'Reptincel' WHERE race = 'Salameche';
 UPDATE Pokemon SET evolution = 'Dracaufeu' WHERE race = 'Reptincel';
 
+INSERT INTO Pokemon VALUES ('Roucool', 25, 'Vol', NULL, NULL);
+INSERT INTO Pokemon VALUES ('Roucoups', 50, 'Vol', NULL, 'Roucool');
+INSERT INTO Pokemon VALUES ('Roucarnage', 0, 'Vol', NULL, 'Roucoups');
+UPDATE Pokemon SET evolution = 'Roucoups' WHERE race = 'Roucool';
+UPDATE Pokemon SET evolution = 'Roucarnage' WHERE race = 'Roucoups';
+
+INSERT INTO Pokemon VALUES ('Rattata', 25, 'Normal', NULL, NULL);
+INSERT INTO Pokemon VALUES ('Rattatac', 50, 'Normal', NULL, 'Rattata');
+UPDATE Pokemon SET evolution = 'Rattatac' WHERE race = 'Rattata';
+
 Prompt Insertion des niveaux;
+
 INSERT INTO Niveau VALUES (1, 0, 1000);
 INSERT INTO Niveau VALUES (2, 1000, 3000);
 INSERT INTO Niveau VALUES (3, 3000, 6000);
@@ -60,6 +72,7 @@ INSERT INTO Item VALUES ('Hyper potion', 'Rend 200 points de vie.');
 INSERT INTO Item VALUES ('Baie', 'Rend le pokemon plus apte a etre capture.');
 
 PROMPT Insertion des succes
+
 INSERT INTO Succes VALUES (1, 'Joggeur', 'Parcourez X km');
 INSERT INTO Succes VALUES (2, 'Collectionneur', 'Capturez X Pokemon');
 INSERT INTO Succes VALUES (3, 'Scientifique', 'Faites evoluer X Pokemon');
@@ -67,14 +80,6 @@ INSERT INTO Succes VALUES (4, 'Eleveur', 'Faites eclore X oeufs');
 INSERT INTO Succes VALUES (5, 'Ornithologue', 'Attrapez X Pokemon Vol');
 INSERT INTO Succes VALUES (6, 'Randonneur', 'Visiter X Pokestop');
 INSERT INTO Succes VALUES (7, 'Combattante', 'Remportez X combats en arene');
-
---Dresseur 3
--- INSERT INTO Oeuf VALUES (7, 1, 1, 5); 
--- INSERT INTO Oeuf VALUES (8, 1, 2, 5);
--- INSERT INTO Oeuf VALUES (9, 0, 0, 2);
---Dresseur 4
--- INSERT INTO Oeuf VALUES (10, 0, 0, 5);
-
 
 Prompt Insertion de pokestop;
 
@@ -89,20 +94,20 @@ PROMPT Insertion de Dresseur;
 /* Ajout du dresseur Pierre, de ses oeufs et de ses Pokemon captures */
 INSERT INTO Dresseur VALUES (1, 
 			Avatar_t('M', 'Brun', 'Bronzee', 'Marron'), 
-			'Pierre le pecheur', 
+			'Pierre', 
 			Coordonnees_t(10.3, 89.5), 
 			1200, 2, '01-JUL-2016', NULL, 120, 62, 
 			NULL, 
-			Liste_Oeufs(Oeuf_t(1, 0, 2, 5), Oeuf_t(2, 0, 3, 5))
+			Liste_Oeufs(Oeuf_t(0, 2, 5), Oeuf_t(0, 3, 5))
 );
 
 INSERT INTO Dresseur VALUES (2, 
 			Avatar_t('F', 'Rousse', 'Blanche', 'Vert'), 
-			'Ondine a bicyclette', 
+			'Ondine', 
 			Coordonnees_t(26.8, 42.5), 
 			11000, 5, '04-JUL-2016', Equipe_t('rouge'), 120, 62, 
 			NULL, 
-			Liste_Oeufs(Oeuf_t(3, 1, 7, 10), Oeuf_t(4, 1, 1, 2), Oeuf_t(5, 1, 8, 10), Oeuf_t(6, 0, 3, 5))
+			Liste_Oeufs(Oeuf_t(1, 7, 10), Oeuf_t(1, 1, 2), Oeuf_t(1, 8, 10), Oeuf_t(0, 3, 5))
 );
 
 INSERT INTO Dresseur VALUES(3,
@@ -111,7 +116,7 @@ INSERT INTO Dresseur VALUES(3,
 			Coordonnees_t(43.60357, 3.91561),
 			12000, 5, '15-JUL-2016', Equipe_t('bleu'), 100, 10,
 			NULL,
-			Liste_Oeufs(Oeuf_t(7, 1, 8, 10), Oeuf_t(8, 0, 0, 2))
+			Liste_Oeufs(Oeuf_t(1, 8, 10), Oeuf_t(0, 0, 2))
 );
 
 INSERT INTO Dresseur VALUES(4,
@@ -120,7 +125,7 @@ INSERT INTO Dresseur VALUES(4,
 			Coordonnees_t(48.860611, 2.337644),
 			37000, 9, '15-JUL-2016', Equipe_t('jaune'), 0, 0,
 			NULL,
-			NULL
+			Liste_Oeufs(Oeuf_t(0, 0, 5))
 );
 
 INSERT INTO Dresseur VALUES(5,
@@ -129,7 +134,7 @@ INSERT INTO Dresseur VALUES(5,
 			Coordonnees_t(46.435453, 3.054045),
 			20000, 6, '29-JUL-2016', Equipe_t('rouge'), 52, 0,
 			NULL,
-			Liste_Oeufs(Oeuf_t(9, 1, 3, 5))
+			Liste_Oeufs(Oeuf_t(1, 2, 25))
 );
 
 Prompt Insertion de pokemon sauvage;
@@ -171,6 +176,96 @@ INSERT INTO Pokemon_Capture VALUES(3, 'Pikachu', 100, 320,
 	(SELECT REF(D) FROM Dresseur D WHERE D.id = '3')
 );
 
+INSERT INTO Pokemon_Capture VALUES(4, 'Raichu', 100, 320,
+	Liste_Attaques(Attaque_t('Eclair', 'electrique', 40, 70), Attaque_t('Cage electrique', 'electrique', 30, 60)),
+	60,
+	25,
+	(SELECT REF(D) FROM Dresseur D WHERE D.id = '4')
+);
+
+INSERT INTO Pokemon_Capture VALUES(5, 'Rattata', 50, 120,
+	Liste_Attaques(Attaque_t('Morsure', 'normal', 40, 75), Attaque_t('Confusion', 'psy', 45, 65)),
+	80,
+	90,
+	(SELECT REF(D) FROM Dresseur D WHERE D.id = '5')
+);
+
+INSERT INTO Pokemon_Capture VALUES(6, 'Roucoups', 65, 82,
+	Liste_Attaques(Attaque_t('Morsure', 'normal', 40, 75), Attaque_t('Coup de griffes', 'combat', 45, 65)),
+	12,
+	23,
+	(SELECT REF(D) FROM Dresseur D WHERE D.id = '1')
+);
+
+INSERT INTO Pokemon_Capture VALUES (7, 'Roucoups', 65, 82,
+	Liste_Attaques(Attaque_t('Morsure', 'normal', 40, 75), Attaque_t('Coup de griffes', 'combat', 45, 65)),
+	12,
+	23,
+	(SELECT REF(D) FROM Dresseur D WHERE D.id = '2')
+);
+
+INSERT INTO Pokemon_Capture VALUES (8, 'Bulbizarre', 50, 70,
+	Liste_Attaques(Attaque_t('Fouet liane', 'combat', 40, 75), Attaque_t('Charge', 'combat', 45, 65)),
+	12,
+	23,
+	(SELECT REF(D) FROM Dresseur D WHERE D.id = '3')
+);
+
+INSERT INTO Pokemon_Capture VALUES (9, 'Florizarre', 120, 170,
+	Liste_Attaques(Attaque_t('Fouet liane', 'combat', 40, 75), Attaque_t('Gaz toxique', 'poison', 45, 65)),
+	80,
+	80,
+	(SELECT REF(D) FROM Dresseur D WHERE D.id = '4')
+);
+
+INSERT INTO Pokemon_Capture VALUES (10, 'Salameche', 100, 90,
+	Liste_Attaques(Attaque_t('Flameche', 'combat', 40, 75), Attaque_t('Charge', 'combat', 45, 65)),
+	29,
+	45,
+	(SELECT REF(D) FROM Dresseur D WHERE D.id = '5')
+);
+
+
+/* Ajout des Pokemon dans la liste des Pokemon du dresseur */
+
+-- Pokemon de Pierre 
+UPDATE Dresseur d
+SET d.pokemons = (SELECT CAST(COLLECT(REF(pc)) as Liste_Pokemon)
+    	       	 FROM Pokemon_Capture pc
+		 WHERE pc.id = 1 AND pc.id = 6)
+WHERE d.id = 1;
+
+-- Pokemon de Ondine
+UPDATE Dresseur d
+SET d.pokemons = (SELECT CAST(COLLECT(REF(pc)) as Liste_Pokemon)
+    	       	 FROM Pokemon_Capture pc
+		 WHERE pc.id = 2 AND pc.id = 7)
+WHERE d.id = 2;
+
+-- Pokemon de Sacha
+UPDATE Dresseur d
+SET d.pokemons = (SELECT CAST(COLLECT(REF(pc)) as Liste_Pokemon)
+    	       	 FROM Pokemon_Capture pc
+		 WHERE pc.id = 3 AND pc.id = 8)
+WHERE d.id = 3;
+
+-- Pokemon de Zaakary 
+UPDATE Dresseur d
+SET d.pokemons = (SELECT CAST(COLLECT(REF(pc)) as Liste_Pokemon)
+    	       	 FROM Pokemon_Capture pc
+		 WHERE pc.id = 4 AND pc.id = 9)
+WHERE d.id = 4;
+
+-- Pokemon d'Agatha
+UPDATE Dresseur d
+SET d.pokemons = (SELECT CAST(COLLECT(REF(pc)) as Liste_Pokemon)
+    	       	 FROM Pokemon_Capture pc
+		 WHERE pc.id = 5 AND pc.id = 10)
+WHERE d.id = 5;
+
+
 Prompt Insertion de bonbon
-INSERT INTO Bonbon VALUES('Pikachu', 3, (SELECT REF(D) FROM Dresseur D WHERE D.id = '3'), 5);
-INSERT INTO Bonbon VALUES('Carapuce', 2, (SELECT REF(D) FROM Dresseur D WHERE D.id = '2'), 3);
+INSERT INTO Bonbon VALUES('Pikachu', 3, (SELECT REF(D) FROM Dresseur D WHERE D.id = 3), 5);
+INSERT INTO Bonbon VALUES('Carapuce', 2, (SELECT REF(D) FROM Dresseur D WHERE D.id = 2), 3);
+
+
