@@ -308,6 +308,7 @@ BEFORE INSERT OR UPDATE ON Posseder_Item
 FOR EACH ROW
 DECLARE
 	v_nb_items number;
+	v_items_ajoutes NUMBER;
 BEGIN
 	SELECT d.nbitems INTO v_nb_items
 	FROM Dresseur d
@@ -316,18 +317,18 @@ BEGIN
 	IF v_nb_items = 350 THEN
 	
 	   RAISE_APPLICATION_ERROR(-20101, 'Nombre d''items maximum atteint.');
+	   	
+	ELSIF v_nb_items + :NEW.nb_item > 350 THEN
 
-	ELSE	      
-	   	IF INSERTING THEN
-		   INSERT INTO Posseder_item
-		   VALUES (:NEW.type_item, :NEW.id_dresseur, :NEW.dresseur, 350 - v_nb_items);
-		ELSE
-			UPDATE Posseder_item
-			SET nb_item = 350 - v_nb_items
-			WHERE type_item = :OLD.type_item AND id_dresseur = :OLD.id_dresseur;
-			
-		END IF;
+	   :NEW.nb_item := 350 - v_nb_items;
+	   
 	END IF;
+
+	
+	UPDATE Dresseur
+	SET nbitems = nbitems + :NEW.nb_item
+	WHERE id = :NEW.id_dresseur;
+
 END;
 /
 
