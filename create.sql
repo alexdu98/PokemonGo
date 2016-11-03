@@ -320,7 +320,7 @@ BEGIN
 	   	
 	ELSIF v_nb_items + :NEW.nb_item > 350 THEN
 
-	   :NEW.nb_item := 350 - v_nb_items;
+	   :NEW.nb_item := :NEW.nb_item + (350 - v_nb_items);
 	   
 	END IF;
 
@@ -355,8 +355,11 @@ FOR EACH ROW
 DECLARE
 	v_pokemon Pokemon.evolution_precedente%TYPE;
 BEGIN
-	SELECT evolution_precedente INTO v_pokemon FROM Pokemon p WHERE p.race = :NEW.race_pokemon;
-	IF v_pokemon != null THEN
+	SELECT evolution_precedente INTO v_pokemon
+	FROM Pokemon p
+	WHERE p.race = :NEW.race_pokemon;
+	
+	IF v_pokemon != NULL THEN
 		RAISE_APPLICATION_ERROR(-20104, 'Les bonbons doivent être du type de base du pokemon.');
 	END IF;
 END;
