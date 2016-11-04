@@ -365,20 +365,35 @@ DECLARE
 	v_date_soustraction number;
 	new_date TIMESTAMP;
 	old_date TIMESTAMP;
+
+	year_new_date NUMBER;
+	year_old_date NUMBER;
+
+	month_new_date NUMBER;
+	month_old_date NUMBER;
+
 BEGIN
 
 	new_date := :NEW.date_derniere_visite;
 	old_date := :OLD.date_derniere_visite;
 
+	year_new_date := EXTRACT (YEAR FROM (new_date));
+	year_old_date := EXTRACT (YEAR FROM (old_date));
+
+	month_new_date := EXTRACT (MONTH FROM (new_date));
+	month_old_date := EXTRACT (MONTH FROM (old_date));
+	
 	-- + EXTRACT (HOUR FROM (new_date-old_date))*60*60+ EXTRACT (MINUTE FROM (new_date-old_date))*60 + EXTRACT (SECOND FROM (new_date-old_date)))/60
+	IF year_new_date = year_old_date AND month_new_date = month_old_date THEN
+	
+		v_date_soustraction := EXTRACT (DAY FROM (new_date-old_date))*24*60 + EXTRACT (HOUR FROM (new_date-old_date))*60 + EXTRACT (MINUTE FROM (new_date-old_date));
 
-	v_date_soustraction := EXTRACT (DAY FROM (new_date-old_date))*24*60 + EXTRACT (HOUR FROM (new_date-old_date))*60 + EXTRACT (MINUTE FROM (new_date-old_date));
+		-- dbms_output.put_line(v_date_soustraction || ' minutes de difference');
 
-	--dbms_output.put_line(v_date_soustraction || ' minutes de difference');
-
-	IF v_date_soustraction < 5 THEN
-		RAISE_APPLICATION_ERROR(-20103, 'Vous avez deja visite ce pokestop il y a moins de 5 minutes. Derniere visite il y a ' || v_date_soustraction || ' minutes.');
-	END IF;
+		IF v_date_soustraction < 5 THEN
+		   RAISE_APPLICATION_ERROR(-20103, 'Vous avez deja visite ce pokestop il y a moins de 5 minutes. Derniere visite il y a ' || v_date_soustraction || ' minutes.');
+		END IF;
+	END IF; 
 END;
 /
 
