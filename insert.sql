@@ -344,16 +344,20 @@ INSERT INTO posseder_item VALUES('Pokeball', 3, (SELECT REF(d) FROM Dresseur d W
 INSERT INTO posseder_item VALUES('Encens', 3, (SELECT REF(d) FROM Dresseur d WHERE d.id = 3),5);
 INSERT INTO posseder_item VALUES('Leurre', 3, (SELECT REF(d) FROM Dresseur d WHERE d.id = 3),10);
 INSERT INTO posseder_item VALUES('Hyper potion', 3, (SELECT REF(d) FROM Dresseur d WHERE d.id = 3),70);
+
+PROMPT ===> Le dresseur 4 possede un total de 325 items (max 350).;
+
 INSERT INTO posseder_item VALUES('Pokeball', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),150);
 INSERT INTO posseder_item VALUES('Encens', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),5);
 INSERT INTO posseder_item VALUES('Baie', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),100);
 INSERT INTO posseder_item VALUES('Super potion', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),70);
 
-Prompt Un trigger se déclenche et fixe le maximum d objets;
+PROMPT ===> On veut ajouter 100 nouveaux items pour le dresseur 4, or il ne reste que 25 places pour arriver a 350.;
+PROMPT ===> 25 items sont ajoutes sur les 100 et le dresseur 4 ne peut plus accueillir de nouveaux items.;
 INSERT INTO posseder_item VALUES('Leurre', 4, (SELECT REF(d) FROM Dresseur d WHERE d.id = 4),100);
 
-Prompt declenche le trigger, et genere une erreur;
+PROMPT ===> On veut ajouter 100 items 'baie' de plus pour le dresseur 4, le trigger check_nb_item leve une exception.;
 UPDATE posseder_item SET nb_item = 200 where type_item = 'Baie' AND id_dresseur = 4;
 
-Prompt on diminue le nombre de baie pour le dresseur 4;
+PROMPT ===> On diminue le nombre de 'baie' de 75 pour le dresseur 4;
 UPDATE posseder_item SET nb_item = 25 where type_item = 'Baie' AND id_dresseur = 4;
