@@ -250,6 +250,8 @@ WHERE d.id = 5;
 PROMPT Insertion de bonbon
 INSERT INTO Bonbon VALUES('Pikachu', 3, (SELECT REF(D) FROM Dresseur D WHERE D.id = 3), 5);
 INSERT INTO Bonbon VALUES('Carapuce', 2, (SELECT REF(D) FROM Dresseur D WHERE D.id = 2), 3);
+INSERT INTO Bonbon VALUES('Bulbizarre', 3, (SELECT REF(D) FROM Dresseur D WHERE D.id = 3), 75);
+INSERT INTO Bonbon VALUES('Salameche', 1, (SELECT REF(D) FROM Dresseur D WHERE D.id = 5), 30);
 
 Prompt trigger bonbon declenche;
 INSERT INTO Bonbon VALUES('Tortank' , 2, (SELECT REF(D) FROM Dresseur D WHERE D.id = 2),3);
