@@ -300,6 +300,8 @@ CREATE TABLE Visite_Pokestop (
 -- ################################################
 -- ################################################
 
+SET serveroutput on;
+
 /*
 	Création des triggers de vérification des contraintes
 */
@@ -382,14 +384,13 @@ BEGIN
 	SELECT evolution_precedente INTO v_pokemon
 	FROM Pokemon p
 	WHERE p.race = :NEW.race_pokemon;
-	
-	IF v_pokemon != NULL THEN
-		RAISE_APPLICATION_ERROR(-20104, 'Les bonbons doivent être du type de base du pokemon.');
+	dbms_output.put_line(v_pokemon);
+	IF v_pokemon IS NOT NULL THEN
+		RAISE_APPLICATION_ERROR(-20104, 'Les bonbons doivent etre du type de base du pokemon.');
 	END IF;
 END;
 /
 
-SET serveroutput on;
 
 CREATE OR REPLACE TRIGGER Check_Equipe_Pokemon_Arene
 BEFORE UPDATE OR INSERT ON Arene
@@ -412,7 +413,7 @@ BEGIN
 		FROM Dresseur d 
 		WHERE d.id = DEREF(DEREF(poke_capt_rec.column_value).maitre).id;
 
-		dbms_output.put_line(couleur || ' vs ' || equipe_couleur);
+		dbms_output.put_line('dresseur : ' || couleur || ' vs ' || ' arene : ' ||equipe_couleur);
 
 		IF couleur != equipe_couleur THEN
 			RAISE_APPLICATION_ERROR(-20105, 'Le Pokemon ne fait pas partie de la meme equipe que l''arene');

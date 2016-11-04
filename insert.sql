@@ -251,6 +251,10 @@ PROMPT Insertion de bonbon
 INSERT INTO Bonbon VALUES('Pikachu', 3, (SELECT REF(D) FROM Dresseur D WHERE D.id = 3), 5);
 INSERT INTO Bonbon VALUES('Carapuce', 2, (SELECT REF(D) FROM Dresseur D WHERE D.id = 2), 3);
 
+Prompt trigger bonbon declenche;
+INSERT INTO Bonbon VALUES('Tortank' , 2, (SELECT REF(D) FROM Dresseur D WHERE D.id = 2),3);
+
+
 Prompt Insertion d arenes;
 INSERT INTO Arene VALUES(1, Coordonnees_t(43.635765, 3.847425), 'Occitania', Equipe_t('bleu'), 210, Liste_Defenseurs(
 	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 3),
