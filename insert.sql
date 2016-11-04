@@ -254,7 +254,6 @@ INSERT INTO Bonbon VALUES('Carapuce', 2, (SELECT REF(D) FROM Dresseur D WHERE D.
 Prompt trigger bonbon declenche;
 INSERT INTO Bonbon VALUES('Tortank' , 2, (SELECT REF(D) FROM Dresseur D WHERE D.id = 2),3);
 
-
 Prompt Insertion d arenes;
 INSERT INTO Arene VALUES(1, Coordonnees_t(43.635765, 3.847425), 'Occitania', Equipe_t('bleu'), 210, Liste_Defenseurs(
 	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 3),
@@ -310,6 +309,18 @@ INSERT INTO Visite_Pokestop VALUES (TO_TIMESTAMP('23-SEP-2016 9:45', 'DD-MON-YYY
        (SELECT REF(d) FROM Dresseur d WHERE d.id = 5),
        (SELECT REF(ps) FROM Pokestop ps WHERE ps.id = 5));
 
+
+prompt une update de visite qui devrait marcher;
+
+UPDATE Visite_Pokestop
+SET date_derniere_visite = TO_TIMESTAMP('12-JUL-2016 13:00', 'DD-MON-YYYY HH24:MI')
+WHERE id_dresseur=1 AND id_pokestop=1;
+
+prompt une update de visite qui devrait declencher un trigger;
+
+UPDATE Visite_Pokestop
+SET date_derniere_visite = TO_TIMESTAMP('3-NOV-2016 12:32', 'DD-MON-YYYY HH24:MI')
+WHERE id_dresseur=2 AND id_pokestop=2;
 
 Prompt Insertion des avancements succes;
 INSERT INTO Avancement_Succes VALUES (1,1,(SELECT REF(d) FROM Dresseur d WHERE d.id = 1),'bronze');

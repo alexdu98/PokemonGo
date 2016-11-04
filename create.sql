@@ -362,15 +362,22 @@ CREATE OR REPLACE TRIGGER Check_Derniere_Visite_Pokestop
 BEFORE UPDATE ON Visite_Pokestop
 FOR EACH ROW
 DECLARE
-	v_date_derniere_visite TIMESTAMP;
+	v_date_soustraction number;
+	new_date TIMESTAMP;
+	old_date TIMESTAMP;
 BEGIN
-	SELECT VP.date_derniere_visite INTO v_date_derniere_visite
-	FROM Visite_Pokestop VP
-	WHERE :NEW.id_dresseur = VP.id_dresseur AND :NEW.id_pokestop = VP.id_pokestop;
 
-	
-	IF v_date_derniere_visite > (SYSDATE - 5/2880) THEN
-		RAISE_APPLICATION_ERROR(-20103, 'Vous avez déjà visité ce pokestop il y a moins de 5 minutes.');
+	new_date := :NEW.date_derniere_visite;
+	old_date := :OLD.date_derniere_visite;
+
+	-- + EXTRACT (HOUR FROM (new_date-old_date))*60*60+ EXTRACT (MINUTE FROM (new_date-old_date))*60 + EXTRACT (SECOND FROM (new_date-old_date)))/60
+
+	v_date_soustraction := EXTRACT (DAY FROM (new_date-old_date))*24*60 + EXTRACT (HOUR FROM (new_date-old_date))*60 + EXTRACT (MINUTE FROM (new_date-old_date));
+
+	--dbms_output.put_line(v_date_soustraction || ' minutes de difference');
+
+	IF v_date_soustraction < 5 THEN
+		RAISE_APPLICATION_ERROR(-20103, 'Vous avez deja visite ce pokestop il y a moins de 5 minutes. Derniere visite il y a ' || v_date_soustraction || ' minutes.');
 	END IF;
 END;
 /
@@ -384,7 +391,6 @@ BEGIN
 	SELECT evolution_precedente INTO v_pokemon
 	FROM Pokemon p
 	WHERE p.race = :NEW.race_pokemon;
-	dbms_output.put_line(v_pokemon);
 	IF v_pokemon IS NOT NULL THEN
 		RAISE_APPLICATION_ERROR(-20104, 'Les bonbons doivent etre du type de base du pokemon.');
 	END IF;
