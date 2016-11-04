@@ -269,9 +269,11 @@ INSERT INTO Arene VALUES(5, Coordonnees_t(48.860611, 2.337644), 'MuseeLouvria', 
 	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 7),
 	(SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 10)));
 
--- UPDATE Arene
--- SET pokemons = Liste_Defenseurs((SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 2))
--- WHERE id = 1; 
+Prompt update dans arene 4;
+
+UPDATE Arene
+SET pokemons = Liste_Defenseurs((SELECT REF(p) FROM Pokemon_Capture p WHERE p.id = 2))
+WHERE id = 4; 
 
 
 Prompt Insertion de pokestop;

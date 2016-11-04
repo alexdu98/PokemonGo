@@ -389,25 +389,32 @@ BEGIN
 END;
 /
 
+SET serveroutput on;
+
 CREATE OR REPLACE TRIGGER Check_Equipe_Pokemon_Arene
 BEFORE UPDATE OR INSERT ON Arene
 FOR EACH ROW
 DECLARE
 	couleur dresseur.equipe.couleur%TYPE;
-	poke_capt_rec REF Dresseur_t;
+	poke_capt_rec REF Pokemon_Capture_t;
+	equipe_couleur VARCHAR(10);
 
 	cursor curs_ref_poke_capt IS
 		SELECT T.column_value 
 		FROM Table (:NEW.pokemons) T;
 		
 BEGIN
+	equipe_couleur := :NEW.equipe.couleur;
+
 	FOR poke_capt_rec IN curs_ref_poke_capt LOOP
 
 		SELECT d.equipe.couleur INTO couleur 
 		FROM Dresseur d 
 		WHERE d.id = DEREF(DEREF(poke_capt_rec.column_value).maitre).id;
-		
-		IF couleur != :NEW.equipe.couleur THEN
+
+		dbms_output.put_line(couleur || ' vs ' || equipe_couleur);
+
+		IF couleur != equipe_couleur THEN
 			RAISE_APPLICATION_ERROR(-20105, 'Le Pokemon ne fait pas partie de la meme equipe que l''arene');
 		END IF;
 	END LOOP;
