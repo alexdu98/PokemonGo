@@ -145,6 +145,13 @@ INSERT INTO Pokemon_Capture VALUES(1, 'Insecateur', 100, 320,
 	(SELECT REF(D) FROM Dresseur D WHERE D.id = '1')
 );
 
+INSERT INTO Pokemon_Capture VALUES(15, 'Carabaffe', 100, 320,
+	Liste_Attaques(Attaque_t('Charge', 'normal', 40, 75), Attaque_t('Pistolet a O', 'eau', 45, 65)),
+	80,
+	60,
+	(SELECT REF(D) FROM Dresseur D WHERE D.id = '1')
+);
+
 INSERT INTO Pokemon_Capture VALUES(2, 'Tortank', 100, 320,
 	Liste_Attaques(Attaque_t('Charge', 'normal', 40, 75), Attaque_t('Pistolet a O', 'eau', 45, 65)),
 	80,
@@ -215,7 +222,7 @@ INSERT INTO Pokemon_Capture VALUES (10, 'Salameche', 100, 90,
 UPDATE Dresseur d
 SET d.pokemons = (SELECT CAST(COLLECT(REF(pc)) as Liste_Pokemon)
     	       	 FROM Pokemon_Capture pc
-		 WHERE pc.id = 1 AND pc.id = 6)
+		 WHERE pc.id = 1 AND pc.id = 6 and pc.id=15)
 WHERE d.id = 1;
 
 -- Pokemon de Ondine
@@ -252,6 +259,7 @@ INSERT INTO Bonbon VALUES('Pikachu', 3, (SELECT REF(D) FROM Dresseur D WHERE D.i
 INSERT INTO Bonbon VALUES('Carapuce', 2, (SELECT REF(D) FROM Dresseur D WHERE D.id = 2), 3);
 INSERT INTO Bonbon VALUES('Bulbizarre', 3, (SELECT REF(D) FROM Dresseur D WHERE D.id = 3), 75);
 INSERT INTO Bonbon VALUES('Salameche', 1, (SELECT REF(D) FROM Dresseur D WHERE D.id = 5), 30);
+INSERT INTO Bonbon VALUES('Carapuce', 1, (SELECT REF(D) FROM Dresseur D WHERE D.id = 1), 100);
 
 Prompt trigger bonbon declenche;
 INSERT INTO Bonbon VALUES('Tortank' , 2, (SELECT REF(D) FROM Dresseur D WHERE D.id = 2),3);
