@@ -4,6 +4,8 @@ DROP TABLE Transaction_type CASCADE CONSTRAINTS;
 DROP TABLE Date_table CASCADE CONSTRAINTS;
 DROP TABLE Lieu CASCADE CONSTRAINTS;
 DROP TABLE Dresseur CASCADE CONSTRAINTS;
+DROP TABLE Dresseur_dynamique CASCADE CONSTRAINTS;
+DROP TABLE bridge_dresseur CASCADE CONSTRAINTS;
 DROP TABLE Paiement CASCADE CONSTRAINTS;
 DROP TABLE Item CASCADE CONSTRAINTS;
 DROP TABLE Transaction CASCADE CONSTRAINTS;
@@ -15,7 +17,7 @@ CREATE TABLE Pokemon(
 	nom varchar(32),
 	type1 varchar(32),
 	type2 varchar(32),
-	CP number,
+	CP number, --Ici on ecrase la valeur du CP lors d'update
 	HP number,
 	attaque1 number,
 	attaque2 number,
@@ -76,10 +78,10 @@ Create table Lieu(
 Create table Dresseur(
 	id_dresseur  NUMBER,
 	pseudo VARCHAR(32),
-	age  NUMBER,
+	--age  NUMBER,
 	mail  VARCHAR(255),
 	nationalite VARCHAR(255),
-	XP_Actuel  NUMBER,
+	--XP_Actuel  NUMBER,
 	date_inscription date,
 	equipe  VARCHAR(5),
 	sexe  VARCHAR(1),
@@ -93,6 +95,28 @@ Create table Dresseur(
 	CONSTRAINT CK_equipe CHECK (equipe in ('rouge','jaune','bleu')),
 	CONSTRAINT CK_sexe CHECK (sexe in ('M','F','I'))
 );
+
+create table Dresseur_dynamique(
+	id_dresseur_dynamique NUMBER,
+	age NUMBER,
+	XP_Actuel NUMBER,
+	CONSTRAINT PK_id_dresseur_dynamique PRIMARY KEY (id_dresseur_dynamique)
+);
+
+create table bridge_dresseur(
+	id_dresseur NUMBER,
+	id_dresseur_dynamique NUMBER,
+	valid_from date,
+	valid_to date,
+	newest NUMBER,
+	version NUMBER,
+	CONSTRAINT PK_bridge PRIMARY KEY (id_dresseur,id_dresseur_dynamique, valid_from),
+	CONSTRAINT FK_ID_DRESSEUR_BRIDGE_DRESSEUR FOREIGN KEY (id_dresseur) REFERENCES Dresseur(id_dresseur),
+	CONSTRAINT FK_ID_DRESSEUR_DYNAMIQUE_BRIDGE_DRESSEUR FOREIGN KEY (id_dresseur_dynamique) REFERENCES Dresseur_dynamique(id_dresseur_dynamique),
+	CONSTRAINT CK_newest CHECK(newest in (0,1))
+);
+
+-- Il faut réaliser un trigger pour éviter que deux dates se chevauchent il me semble
 
 
 CREATE TABLE Paiement(
@@ -110,16 +134,21 @@ CREATE TABLE Paiement(
 	CONSTRAINT PK_id_Paiement PRIMARY KEY (id_Paiement)
 );
 
+-- il y a un attribut OLD_nomAttribut pour les attributs susceptibles d'etre changés pour un équilibrage du jeu
 CREATE TABLE Item(
 	id_Item  NUMBER,
 	nom  VARCHAR(255),
 	description  VARCHAR(255),
 	type  VARCHAR(255),
 	bonus_HP  NUMBER,
+	OLD_bonus_HP NUMBER,
 	bonus_CP  NUMBER,
+	OLD_bonus_CP  NUMBER,
 	rarete  VARCHAR(255),
+	OLD_rarete VARCHAR(255),
 	cible_item  VARCHAR(255),
 	efficacite_pokeball  NUMBER,
+	OLD_efficacite_pokeball  NUMBER,
 	CONSTRAINT id_Item PRIMARY KEY (id_Item)
 );
 
