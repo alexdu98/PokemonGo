@@ -112,7 +112,7 @@ create table bridge_dresseur(
 	version NUMBER,
 	CONSTRAINT PK_bridge PRIMARY KEY (id_dresseur,id_dresseur_dynamique, valid_from),
 	CONSTRAINT FK_ID_DRESSEUR_BRIDGE_DRESSEUR FOREIGN KEY (id_dresseur) REFERENCES Dresseur(id_dresseur),
-	CONSTRAINT FK_ID_DRESSEUR_DYNAMIQUE_BRIDGE_DRESSEUR FOREIGN KEY (id_dresseur_dynamique) REFERENCES Dresseur_dynamique(id_dresseur_dynamique),
+	CONSTRAINT FK_ID_DRESS_DYN_BRIDGE_DRESS FOREIGN KEY (id_dresseur_dynamique) REFERENCES Dresseur_dynamique(id_dresseur_dynamique),
 	CONSTRAINT CK_newest CHECK(newest in (0,1))
 );
 
