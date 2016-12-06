@@ -19,8 +19,8 @@ CREATE TABLE Pokemon(
 	type2 varchar(32),
 	CP number, --Ici on ecrase la valeur du CP lors d'update
 	HP number,
-	attaque1 number,
-	attaque2 number,
+	attaque1 VARCHAR(255),
+	attaque2 VARCHAR(255),
 	taille float,
 	poids float,
 	CONSTRAINT PK_POKEMON PRIMARY KEY (id_pokemon)
@@ -61,9 +61,9 @@ Create table Date_entrepot(
 
 Create table Lieu(
 	id_lieu NUMBER,
-	longitude NUMBER,
-	latitude NUMBER,
-	altitude NUMBER,
+	longitude FLOAT(6),
+	latitude FLOAT(6),
+	altitude FLOAT(2),
 	pays VARCHAR(255),
 	ville VARCHAR(255),
 	departement VARCHAR(255),
@@ -159,9 +159,9 @@ CREATE TABLE Transaction(
 	id_Date NUMBER,
 	id_Lieu NUMBER,
 	id_Item NUMBER,
-	prix_unitaire NUMBER,
+	prix_unitaire FLOAT(2),
 	quantite NUMBER,
-	depense_total NUMBER,
+	depense_total FLOAT(2),
 	CONSTRAINT PK_ID PRIMARY KEY (id),
 	CONSTRAINT FK_ID_PAIEMENT_TRANSACTION FOREIGN KEY (id_Paiement) REFERENCES Paiement(id_Paiement),
 	CONSTRAINT FK_ID_DRESSEUR_TRANSACTION FOREIGN KEY (id_Dresseur) REFERENCES Dresseur(id_Dresseur),
@@ -189,20 +189,28 @@ CREATE TABLE Capture(
 	CONSTRAINT FK_ID_CONDITION_CAPTURE FOREIGN KEY (id_condition) REFERENCES Condition(id_condition)
 );
 
+
+SET serveroutput on;
+
 CREATE OR REPLACE TRIGGER CHECK_DATE_VALIDE
 BEFORE UPDATE OR INSERT ON bridge_dresseur
 FOR EACH ROW
 DECLARE
-	date_valide date;
+	var_date_valide date;
 BEGIN
-	-- la requete va récupérer la date d'avant si les deux dates sont bien superposés, date_valide devrais etre nul...
-	SELECT valid_to into date_valide
-	FROM bridge_dresseur bd 
-	WHERE bd.id_dresseur = :new.id_dresseur AND bd.id_dresseur_dynamique = :new.id_dresseur_dynamique
-	AND bd.newest = 1;
-	
-	IF date_valide > :new.valid_from THEN
-		RAISE_APPLICATION_ERROR(-20106, 'Les dates ne se suivent pas (valid_to != :new.valid_from).');
+	-- C'est la premiere version, du coup il n'y a pas d'antecedant
+	IF :new.version = 1 THEN
+		RETURN;
 	END IF;
+
+	-- Ici on recupère l'ancienne date
+	SELECT valid_to into var_date_valide
+	FROM bridge_dresseur bd 
+	WHERE bd.id_dresseur = :new.id_dresseur AND bd.version = (:new.version-1);
+
+	IF :new.valid_from < var_date_valide THEN
+		RAISE_APPLICATION_ERROR(-20106, 'les dates se chevauchent (:new.valid_from < valid_to)');
+	END IF;
+
 END;
 /
