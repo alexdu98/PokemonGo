@@ -198,8 +198,10 @@ BEGIN
 	-- la requete va récupérer la date d'avant si les deux dates sont bien superposés, date_valide devrais etre nul...
 	SELECT valid_to into date_valide
 	FROM bridge_dresseur bd 
-	WHERE bd.id_dresseur = :new.id_dresseur AND bd.valid_to = :new.valid_from;
-	IF date_valide = NULL THEN
+	WHERE bd.id_dresseur = :new.id_dresseur AND bd.id_dresseur_dynamique = :new.id_dresseur_dynamique
+	AND bd.newest = 1;
+	
+	IF date_valide > :new.valid_from THEN
 		RAISE_APPLICATION_ERROR(-20106, 'Les dates ne se suivent pas (valid_to != :new.valid_from).');
 	END IF;
 END;
