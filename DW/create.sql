@@ -85,12 +85,6 @@ Create table Dresseur(
 	date_inscription date,
 	equipe  VARCHAR(5),
 	sexe  VARCHAR(1),
-	couleur_cheveux  VARCHAR(255), 
-	couleur_yeux  VARCHAR(255),
-	couleur_peau  VARCHAR(255),
-	couleur_sac  VARCHAR(255),
-	type_vetement  VARCHAR(255),
-	type_bonnet  VARCHAR(255),
 	CONSTRAINT PK_id_dresseur PRIMARY KEY (id_dresseur),
 	CONSTRAINT CK_equipe CHECK (equipe in ('rouge','jaune','bleu')),
 	CONSTRAINT CK_sexe CHECK (sexe in ('M','F','I'))
@@ -100,6 +94,12 @@ create table Dresseur_dynamique(
 	id_dresseur_dynamique NUMBER,
 	age NUMBER,
 	XP_Actuel NUMBER,
+	couleur_cheveux  VARCHAR(255), 
+	couleur_yeux  VARCHAR(255),
+	couleur_peau  VARCHAR(255),
+	couleur_sac  VARCHAR(255),
+	type_vetement  VARCHAR(255),
+	type_bonnet  VARCHAR(255),
 	CONSTRAINT PK_id_dresseur_dynamique PRIMARY KEY (id_dresseur_dynamique)
 );
 
@@ -188,3 +188,19 @@ CREATE TABLE Capture(
 	CONSTRAINT FK_ID_TRANSACTION_TYPE_CAPTURE FOREIGN KEY (id_transaction_type) REFERENCES Transaction_type(id_transaction),
 	CONSTRAINT FK_ID_CONDITION_CAPTURE FOREIGN KEY (id_condition) REFERENCES Condition(id_condition)
 );
+
+CREATE OR REPLACE TRIGGER CHECK_DATE_VALIDE
+BEFORE UPDATE OR INSERT ON bridge_dresseur
+FOR EACH ROW
+DECLARE
+	date_valide date;
+BEGIN
+	-- la requete va récupérer la date d'avant si les deux dates sont bien superposés, date_valide devrais etre nul...
+	SELECT valid_to into date_valide
+	FROM bridge_dresseur bd 
+	WHERE bd.id_dresseur = :new.id_dresseur AND bd.valid_to = :new.valid_from;
+	IF date_valide = NULL THEN
+		RAISE_APPLICATION_ERROR(-20106, 'Les dates ne se suivent pas (valid_to != :new.valid_from).');
+	END IF;
+END;
+/
