@@ -201,28 +201,26 @@ CREATE TABLE Capture(
 SET serveroutput on;
 
 CREATE OR REPLACE TRIGGER CHECK_DATE_VALIDE
-BEFORE UPDATE OR INSERT ON bridge_dresseur
+BEFORE INSERT ON bridge_dresseur
 FOR EACH ROW
-DECLARE
-	var_date_valide date;
+-- DECLARE
+-- 	var_date_valide date;
 BEGIN
+	
+	:new.valid_from := SYSDATE;
+
 	-- C'est la premiere version, du coup il n'y a pas d'antecedant
 	IF :new.version = 1 THEN
 		RETURN;
 	END IF;
 
-	-- Ici on recupère l'ancienne date
-	SELECT valid_to into var_date_valide
-	FROM bridge_dresseur bd 
-	WHERE bd.id_dresseur = :new.id_dresseur AND bd.version = (:new.version - 1);
-
 	UPDATE bridge_dresseur bd
 	SET bd.newest = 0, bd.valid_to = SYSDATE
 	WHERE bd.id_dresseur = :new.id_dresseur AND bd.newest = 1;
 
-	IF :new.valid_from < var_date_valide THEN
-	   RAISE_APPLICATION_ERROR(-20106, 'les dates se chevauchent (:new.valid_from < valid_to)');
-	END IF;
+	-- IF :new.valid_from < var_date_valide THEN
+	--    RAISE_APPLICATION_ERROR(-20106, 'les dates se chevauchent (:new.valid_from < valid_to)');
+	-- END IF;
 
 END;
 /
@@ -243,7 +241,7 @@ END;
 	--**********************************************--
 
 CREATE OR REPLACE VIEW Date_Capture AS
-SELECT de.id_date, 
+SELECT DISTINCT(de.id_date), 
 	de.date_champ,
 	de.jour,
 	de.jour_semaine,
@@ -256,7 +254,7 @@ FROM Date_entrepot de
 JOIN Capture c ON de.id_date = c.id_date;
 
 CREATE OR REPLACE FORCE VIEW Date_Transaction AS
-SELECT de.id_date, 
+SELECT DISTINCT(de.id_date), 
 	de.date_champ,
 	de.jour,
 	de.jour_semaine,
@@ -269,7 +267,7 @@ FROM Date_entrepot de
 JOIN Transaction t ON de.id_date = t.id_date;
 
 CREATE OR REPLACE FORCE VIEW Lieu_Capture AS
-SELECT l.id_lieu,
+SELECT DISTINCT(l.id_lieu),
 	l.longitude,
 	l.latitude,
 	l.altitude,
@@ -285,7 +283,7 @@ FROM Lieu l
 JOIN Capture c ON l.id_lieu = c.id_lieu;
 
 CREATE OR REPLACE FORCE VIEW Lieu_Transaction AS
-SELECT l.id_lieu,
+SELECT DISTINCT(l.id_lieu),
 	l.longitude,
 	l.latitude,
 	l.altitude,
@@ -301,7 +299,7 @@ FROM Lieu l
 JOIN Transaction t ON l.id_lieu = t.id_Lieu;
 
 CREATE OR REPLACE FORCE VIEW Dresseur_Capture AS
-SELECT d.id_dresseur,
+SELECT DISTINCT(d.id_dresseur),
 	d.pseudo,
 	d.mail,
 	d.nationalite,
@@ -312,7 +310,7 @@ FROM Dresseur d
 JOIN Capture c ON d.id_dresseur = c.id_dresseur;
 
 CREATE OR REPLACE FORCE VIEW Dresseur_Transaction AS
-SELECT d.id_dresseur,
+SELECT DISTINCT(d.id_dresseur),
 	d.pseudo,
 	d.mail,
 	d.nationalite,
@@ -323,7 +321,7 @@ FROM Dresseur d
 JOIN Transaction t ON d.id_dresseur = t.id_Dresseur;
 
 CREATE OR REPLACE FORCE VIEW Dresseur_Dyn_Capture AS
-SELECT d.id_dresseur_dynamique,
+SELECT DISTINCT(d.id_dresseur_dynamique),
 	d.age,
 	d.XP_Actuel,
 	d.couleur_cheveux, 
@@ -336,7 +334,7 @@ FROM Dresseur_dynamique d
 JOIN Capture c ON d.id_dresseur_dynamique = c.id_dresseur_dynamique;
 
 CREATE OR REPLACE FORCE VIEW Dresseur_Dyn_Transaction AS
-SELECT d.id_dresseur_dynamique,
+SELECT DISTINCT(d.id_dresseur_dynamique),
 	d.age,
 	d.XP_Actuel,
 	d.couleur_cheveux, 
@@ -347,52 +345,3 @@ SELECT d.id_dresseur_dynamique,
 	d.type_bonnet 
 FROM Dresseur_dynamique d
 JOIN Transaction t ON d.id_dresseur_dynamique = t.id_dresseur_dynamique;
-
-        --**********************************************--
-	--               VUES MATERIALISEES
-	--**********************************************--	
-DROP MATERIALIZED VIEW CaptureParMoisEtParVille;
-DROP MATERIALIZED VIEW JointureCaptureMois;
-DROP MATERIALIZED VIEW JoinCapturePokemonCondition;
-DROP MATERIALIZED VIEW TransactionEnArgentReel;
-DROP MATERIALIZED VIEW SumQuantiteVenduByItem;
-DROP MATERIALIZED VIEW NbPokemonByDresseur;
-
-CREATE MATERIALIZED VIEW CaptureParMoisEtParVille (mois, ville, nbPokemonCapture) AS 
-SELECT mois, ville, COUNT(*) AS nbPokemonCapture 
-FROM Capture c
-JOIN Date_Capture d ON d.id_Date = c.id_Date
-JOIN Lieu_Capture l ON l.id_Lieu = c.id_Lieu
-GROUP BY mois, ville
-ORDER BY nbPokemonCapture;
-
-CREATE MATERIALIZED VIEW JointureCaptureMois (mois, id_Lieu, id_Condition) AS
-SELECT mois, id_Lieu, id_Condition
-FROM Capture c
-JOIN Date_Capture d ON d.id_Date=c.id_Date;
-
-CREATE MATERIALIZED VIEW JoinCapturePokemonCondition (nom, nombre_essai, nombre_baie, duree) AS
-SELECT nom, nombre_essais, nombre_baie, duree
-FROM Capture c
-JOIN Pokemon p ON p.id_Pokemon=c.id_Pokemon
-JOIN Condition co ON co.id_Condition=c.id_Condition;
-
-CREATE MATERIALIZED VIEW TransactionEnArgentReel (devise, depense_total) AS
-SELECT devise, depense_total
-FROM Transaction t
-JOIN Paiement p ON p.id_Paiement=t.id_Paiement
-WHERE devise != 'pokecoins';
-
-CREATE MATERIALIZED VIEW SumQuantiteVenduByItem (nom, quantiteTotalVendu) AS
-SELECT nom, SUM(quantite) AS quantiteTotalVendu
-FROM Transaction t
-JOIN Item i ON i.id_Item = t.id_Item
-GROUP BY nom;
-
-CREATE MATERIALIZED VIEW NbPokemonByDresseur (id_dresseur, nbCapture) AS
-SELECT c.id_Dresseur, COUNT(*) AS nbCapture
-FROM Capture c
-JOIN Dresseur_Capture d ON d.id_Dresseur=c.id_Dresseur
-GROUP BY c.id_Dresseur;
-
-
