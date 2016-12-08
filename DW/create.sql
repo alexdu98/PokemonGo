@@ -214,7 +214,7 @@ BEGIN
 	-- Ici on recupère l'ancienne date
 	SELECT valid_to into var_date_valide
 	FROM bridge_dresseur bd 
-	WHERE bd.id_dresseur = :new.id_dresseur AND bd.version = (:new.version-1);
+	WHERE bd.id_dresseur = :new.id_dresseur AND bd.version = (:new.version - 1);
 
 	IF :new.valid_from < var_date_valide THEN
 		RAISE_APPLICATION_ERROR(-20106, 'les dates se chevauchent (:new.valid_from < valid_to)');
@@ -223,9 +223,33 @@ BEGIN
 END;
 /
 
-	--*******************************************
+CREATE OR REPLACE TRIGGER CHECK_DATE_VALIDE
+BEFORE UPDATE OR INSERT ON bridge_dresseur
+FOR EACH ROW
+DECLARE
+	var_date_valide date;
+BEGIN
+
+	-- C'est la premiere version, du coup il n'y a pas d'antecedant
+	IF :new.version = 1 THEN
+		RETURN;
+	END IF;
+
+	-- Ici on recupère l'ancienne date
+	SELECT valid_to into var_date_valide
+	FROM bridge_dresseur bd 
+	WHERE bd.id_dresseur = :new.id_dresseur AND bd.version = (:new.version - 1);
+
+	IF :new.valid_from < var_date_valide THEN
+		RAISE_APPLICATION_ERROR(-20106, 'les dates se chevauchent (:new.valid_from < valid_to)');
+	END IF;
+
+END;
+/
+
+	--**********************************************--
 	--               VUES VIRTUELLES
-	--**********************************************/
+	--**********************************************--
 
 CREATE OR REPLACE VIEW Date_Capture AS
 SELECT de.id_date, 
@@ -333,5 +357,46 @@ SELECT d.id_dresseur_dynamique,
 FROM Dresseur_dynamique d
 JOIN Transaction t ON d.id_dresseur_dynamique = t.id_dresseur_dynamique;
 
+        --**********************************************--
+	--               VUES MATERIALISEES
+	--**********************************************--	
+
+CREATE MATERIALIZED VIEW CaptureParMoisEtParVille (mois, ville, nbPokemonCapture) AS 
+SELECT mois, ville, COUNT(*) AS nbPokemonCapture 
+FROM Capture c
+JOIN Date_Capture d ON d.id_Date = c.id_Date
+JOIN Lieu_Capture l ON l.id_Lieu = c.id_Lieu
+GROUP BY mois, ville
+ORDER BY nbPokemonCapture;
+
+
+CREATE MATERIALIZED VIEW JointureCaptureMois (mois, id_Lieu, id_Condition) AS
+SELECT mois, id_Lieu, id_Condition
+FROM Capture c
+JOIN Date_Capture d ON d.id_Date=c.id_Date;
+
+CREATE MATERIALIZED VIEW JointureCapturePokemonCondition (nom, nombre_essai, nombre_baie, duree) AS
+SELECT nom, nombre_essai, nombre_baie, duree
+FROM Capture c
+JOIN Pokemon p ON p.id_Pokemon=c.id_Pokemon
+JOIN Condition co ON co.id_Condition=c.id_Condition;
+
+CREATE MATERIALIZED VIEW TransactionEnArgentReel (devise, depense_total) AS
+SELECT devise, depense_total
+FROM Transaction t
+JOIN Paiement p ON p.id_Paiement=t.id_Paiement
+WHERE devise != "pokecoins";
+
+CREATE MATERIALIZED VIEW SumQuantiteVenduByItem (nom, quantiteTotalVendu)
+SELECT nom, SUM(quantite) AS quantiteTotalVendu
+FROM Transaction t
+JOIN Item i ON i.id_Item=t.id_Item
+GROUP BY nom;
+
+CREATE MATERIALIZED VIEW NbPokemonByDresseur (id_dresseur, nbCapture) AS
+SELECT id_Dresseur, COUNT(*) AS nbCapture
+FROM Capture c
+JOIN Dresseur_Capture d ON d.id_Dresseur=c.id_Dresseur
+GROUP BY id_Dresseur;
 
 
