@@ -11,7 +11,7 @@ DELETE FROM Dresseur_dynamique;
 DELETE FROM Paiement;
 DELETE FROM Item;
 
-INSERT INTO Item VALUES (568 , 'pokeball' , 'sert a capturer des pokemons' , 'simple' , 50 , null, 40 , null, 'commun', null , 'pokemon' , 50, null );
+INSERT INTO Item VALUES (568 , 'pokeball' , 'sert a capturer des pokemons' , 'simple' , 50 , null, 40 , null, 'commun', null , 'pokemon' , 50, null);
 INSERT INTO Item VALUES (302 , 'pokecoin ',' sert de monnaie dans le jeu ', null , 10 , null, 15 , null , null , null , null , null , null);
 INSERT INTO Item VALUES (259 , 'baies' , 'sert a apaiser le pokemon',  null , 20 , null, 15 , null, 'commun' , null, null , null, null);
 

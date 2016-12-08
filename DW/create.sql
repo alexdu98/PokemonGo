@@ -11,6 +11,14 @@ DROP TABLE Item CASCADE CONSTRAINTS;
 DROP TABLE Transaction CASCADE CONSTRAINTS;
 DROP TABLE Capture CASCADE CONSTRAINTS;
 
+DROP VIEW Date_Capture;
+DROP VIEW Date_Transaction;
+DROP VIEW Lieu_Capture;
+DROP VIEW Lieu_Transaction;
+DROP VIEW Dresseur_Capture;
+DROP VIEW Dresseur_Transaction;
+DROP VIEW Dresseur_Dyn_Capture;
+DROP VIEW Dresseur_Dyn_Transaction;
 
 CREATE TABLE Pokemon(
 	id_pokemon number,
@@ -78,10 +86,8 @@ Create table Lieu(
 Create table Dresseur(
 	id_dresseur  NUMBER,
 	pseudo VARCHAR(32),
-	--age  NUMBER,
 	mail  VARCHAR(255),
 	nationalite VARCHAR(255),
-	--XP_Actuel  NUMBER,
 	date_inscription date,
 	equipe  VARCHAR(5),
 	sexe  VARCHAR(1),
@@ -156,6 +162,7 @@ CREATE TABLE Transaction(
 	id NUMBER,
 	id_Paiement NUMBER,
 	id_Dresseur NUMBER,
+	id_dresseur_dynamique NUMBER,
 	id_Date NUMBER,
 	id_Lieu NUMBER,
 	id_Item NUMBER,
@@ -175,6 +182,7 @@ CREATE TABLE Transaction(
 CREATE TABLE Capture(
 	id_Capture NUMBER,
 	id_dresseur number,
+	id_dresseur_dynamique NUMBER,
 	id_date number,
 	id_lieu number,
 	id_pokemon number,
@@ -214,3 +222,116 @@ BEGIN
 
 END;
 /
+
+	--*******************************************
+	--               VUES VIRTUELLES
+	--**********************************************/
+
+CREATE OR REPLACE VIEW Date_Capture AS
+SELECT de.id_date, 
+	de.date_champ,
+	de.jour,
+	de.jour_semaine,
+	de.num_semaine,
+	de.mois,
+	de.annee,
+	de.indication_promotion,
+	de.indicateur_vacance
+FROM Date_entrepot de 
+JOIN Capture c ON de.id_date = c.id_date;
+
+CREATE OR REPLACE FORCE VIEW Date_Transaction AS
+SELECT de.id_date, 
+	de.date_champ,
+	de.jour,
+	de.jour_semaine,
+	de.num_semaine,
+	de.mois,
+	de.annee,
+	de.indication_promotion,
+	de.indicateur_vacance
+FROM Date_entrepot de 
+JOIN Transaction t ON de.id_date = t.id_date;
+
+CREATE OR REPLACE FORCE VIEW Lieu_Capture AS
+SELECT l.id_lieu,
+	l.longitude,
+	l.latitude,
+	l.altitude,
+	l.pays,
+	l.ville,
+	l.departement,
+	l.num_rue,
+	l.type_rue,
+	l.intitule_rue,
+	l.code_postal,
+	l.cedex
+FROM Lieu l 
+JOIN Capture c ON l.id_lieu = c.id_lieu;
+
+CREATE OR REPLACE FORCE VIEW Lieu_Transaction AS
+SELECT l.id_lieu,
+	l.longitude,
+	l.latitude,
+	l.altitude,
+	l.pays,
+	l.ville,
+	l.departement,
+	l.num_rue,
+	l.type_rue,
+	l.intitule_rue,
+	l.code_postal,
+	l.cedex
+FROM Lieu l 
+JOIN Transaction t ON l.id_lieu = t.id_Lieu;
+
+CREATE OR REPLACE FORCE VIEW Dresseur_Capture AS
+SELECT d.id_dresseur,
+	d.pseudo,
+	d.mail,
+	d.nationalite,
+	d.date_inscription,
+	d.equipe,
+	d.sexe
+FROM Dresseur d
+JOIN Capture c ON d.id_dresseur = c.id_dresseur;
+
+CREATE OR REPLACE FORCE VIEW Dresseur_Transaction AS
+SELECT d.id_dresseur,
+	d.pseudo,
+	d.mail,
+	d.nationalite,
+	d.date_inscription,
+	d.equipe,
+	d.sexe
+FROM Dresseur d 
+JOIN Transaction t ON d.id_dresseur = t.id_Dresseur;
+
+CREATE OR REPLACE FORCE VIEW Dresseur_Dyn_Capture AS
+SELECT d.id_dresseur_dynamique,
+	d.age,
+	d.XP_Actuel,
+	d.couleur_cheveux, 
+	d.couleur_yeux,
+	d.couleur_peau,
+	d.couleur_sac,
+	d.type_vetement,
+	d.type_bonnet 
+FROM Dresseur_dynamique d 
+JOIN Capture c ON d.id_dresseur_dynamique = c.id_dresseur_dynamique;
+
+CREATE OR REPLACE FORCE VIEW Dresseur_Dyn_Transaction AS
+SELECT d.id_dresseur_dynamique,
+	d.age,
+	d.XP_Actuel,
+	d.couleur_cheveux, 
+	d.couleur_yeux,
+	d.couleur_peau,
+	d.couleur_sac,
+	d.type_vetement,
+	d.type_bonnet 
+FROM Dresseur_dynamique d
+JOIN Transaction t ON d.id_dresseur_dynamique = t.id_dresseur_dynamique;
+
+
+
